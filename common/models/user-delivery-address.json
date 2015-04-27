@@ -1,0 +1,123 @@
+{
+  "name": "UserDeliveryAddress",
+  "base": "PersistedModel",
+  "plural": "user-delivery-addresses",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mongodb": {
+      "database": "db_pollexmom",
+      "collection": "c_user_delivery_addresses"
+    },
+    "oracle": {
+      "schema": "S_POLLEXMOM",
+      "table": "T_USER_DELIVERY_ADDRESS"
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "number",
+      "id": true,
+      "required": true,
+      "oracle": {
+        "columnName": "USER_DELIVERY_ADDRESS_ID"
+      }
+    },
+    "consigneeName": {
+      "type": "string",
+      "required": true,
+      "oracle": {
+        "columnName": "USER_DELIVERY_ADDRESS_CONSIGNEE_NAME"
+      }
+    },
+    "consigneeTel": {
+      "type": "string",
+      "required": true,
+      "oracle": {
+        "columnName": "USER_DELIVERY_ADDRESS_TEL"
+      }
+    },
+    "provinceId": {
+      "type": "number",
+      "oracle": {
+        "columnName": "USER_DELIVERY_ADDRESS_PROVINCE_ID"
+      }
+    },
+    "provinceName": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_DELIVERY_ADDRESS_PROVINCE_NAME"
+      }
+    },
+    "cityId": {
+      "type": "number",
+      "oracle": {
+        "columnName": "USER_DELIVERY_ADDRESS_CITY_ID"
+      }
+    },
+    "cityName": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_DELIVERY_ADDRESS_CITY_NAME"
+      }
+    },
+    "regionId": {
+      "type": "number",
+      "oracle": {
+        "columnName": "USER_DELIVERY_ADDRESS_REGION_ID"
+      }
+    },
+    "regionName": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_DELIVERY_ADDRESS_REGION_NAME"
+      }
+    },
+    "townId": {
+      "type": "number",
+      "oracle": {
+        "columnName": "USER_DELIVERY_ADDRESS_TOWN_ID"
+      }
+    },
+    "townName": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_DELIVERY_ADDRESS_TOWN_NAME"
+      }
+    },
+    "detailAddress": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_DELIVERY_ADDRESS_DETAIL_ADDRESS"
+      }
+    },
+    "zipCode": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_DELIVERY_ADDRESS_ZIP_CODE"
+      }
+    },
+    "created": {
+      "type": "date",
+      "oracle": {
+        "columnName": "CREATED"
+      }
+    },
+    "modified": {
+      "type": "date",
+      "oracle": {
+        "columnName": "MODIFIED"
+      }
+    }
+  },
+  "validations": [],
+  "relations": {
+    "user": {
+      "type": "belongsTo",
+      "model": "user",
+      "foreignKey": "userId"
+    }
+  },
+  "acls": [],
+  "methods": []
+}

@@ -1,0 +1,70 @@
+{
+  "name": "Province",
+  "base": "PersistedModel",
+  "plural": "provinces",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mongodb": {
+      "database": "db_pollexmom",
+      "collection": "c_provinces"
+    },
+    "oracle": {
+      "schema": "S_POLLEXMOM",
+      "table": "T_PROVINCE"
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "number",
+      "id": true,
+      "required": true,
+      "oracle": {
+        "columnName": "PROVINCE_ID"
+      }
+    },
+    "name": {
+      "type": "string",
+      "required": true,
+      "oracle": {
+        "columnName": "PROVINCE_NAME"
+      }
+    },
+    "created": {
+      "type": "date",
+      "oracle": {
+        "columnName": "CREATED"
+      }
+    },
+    "createdBy": {
+      "type": "number",
+      "oracle": {
+        "columnName": "CREATED_BY"
+      }
+    },
+    "modified": {
+      "type": "date",
+      "oracle": {
+        "columnName": "MODIFIED",
+        "nullable": "Y"
+      }
+    },
+    "modifiedBy": {
+      "type": "number",
+      "oracle": {
+        "columnName": "MODIFIED_BY",
+        "nullable": "Y"
+      }
+    }
+  },
+  "validations": [],
+  "relations": {
+    "cities": {
+      "type": "hasMany",
+      "model": "City",
+      "foreignKey": "cityId"
+    }
+  },
+  "acls": [],
+  "methods": []
+}

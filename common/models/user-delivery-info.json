@@ -1,0 +1,49 @@
+{
+  "name": "UserDeliveryInfo",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "plural": "user-delivery-info",
+  "options": {
+    "validateUpsert": true,
+    "mongodb": {
+      "database": "db_pollexmom",
+      "collection": "c_user_delivery_info"
+    },
+    "oracle": {
+      "schema": "S_POLLEXMOM",
+      "table": "T_USER_DELIVERY_INFO"
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "number",
+      "id": true,
+      "required": true,
+      "oracle": {
+        "columnName": "USER_DELIVERY_INFO_ID"
+      }
+    },
+    "defaultAddressId": {
+      "type": "number",
+      "oracle": {
+        "columnName": "USER_DELIVERY_INFO_DEFAULT_ADDRESS_ID"
+      }
+    },
+    "created": {
+      "type": "date",
+      "oracle": {
+        "columnName": "CREATED"
+      }
+    },
+    "modified": {
+      "type": "date",
+      "oracle": {
+        "columnName": "MODIFIED"
+      }
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

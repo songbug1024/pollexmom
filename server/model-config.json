@@ -7,9 +7,6 @@
       "./models"
     ]
   },
-  "User": {
-    "dataSource": "db"
-  },
   "AccessToken": {
     "dataSource": "db",
     "public": false
@@ -25,5 +22,37 @@
   "Role": {
     "dataSource": "db",
     "public": false
+  },
+  "user": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "UserInfo": {
+    "dataSource": "mongodb",
+    "public": false
+  },
+  "UserDeliveryInfo": {
+    "dataSource": "mongodb",
+    "public": false
+  },
+  "UserDeliveryAddress": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "Province": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "City": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "Region": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "Town": {
+    "dataSource": "mongodb",
+    "public": true
   }
 }

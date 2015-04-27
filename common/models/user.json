@@ -1,0 +1,186 @@
+{
+  "name": "user",
+  "base": "User",
+  "plural": "users",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mongodb": {
+      "database": "db_pollexmom",
+      "collection": "c_users"
+    },
+    "oracle": {
+      "schema": "S_POLLEXMOM",
+      "table": "T_USER"
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "number",
+      "id": true,
+      "required": true,
+      "oracle": {
+        "columnName": "USER_ID"
+      }
+    },
+    "username": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_NAME"
+      }
+    },
+    "password": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_PASSWORD"
+      }
+    },
+    "email": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_EMAIL"
+      }
+    },
+    "emailVerified": {
+      "type": "boolean",
+      "oracle": {
+        "columnName": "USER_EMAIL_VERIFIED"
+      }
+    },
+    "verificationToken": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_EMAIL_VERIFICATION_TOKEN"
+      }
+    },
+    "tel": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_TEL"
+      }
+    },
+    "avatar": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_AVATAR"
+      }
+    },
+    "desc": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_DESC"
+      }
+    },
+    "status": {
+      "type": "string",
+      "oracle": {
+        "columnName": "USER_STATUS"
+      }
+    },
+    "created": {
+      "type": "date",
+      "oracle": {
+        "columnName": "CREATED"
+      }
+    },
+    "createdBy": {
+      "type": "number",
+      "oracle": {
+        "columnName": "CREATED_BY"
+      }
+    },
+    "modified": {
+      "type": "date",
+      "oracle": {
+        "columnName": "MODIFIED"
+      }
+    },
+    "modifiedBy": {
+      "type": "number",
+      "oracle": {
+        "columnName": "MODIFIED_BY"
+      }
+    }
+  },
+  "validations": [],
+  "relations": {
+    "personalInfo": {
+      "type": "hasOne",
+      "model": "UserInfo",
+      "foreignKey": "userInfoId"
+    },
+    "deliveryInfo": {
+      "type": "hasOne",
+      "model": "UserDeliveryInfo",
+      "foreignKey": "userDeliveryInfoId"
+    },
+    "deliveryAddresses": {
+      "type": "hasMany",
+      "model": "UserDeliveryAddress",
+      "foreignKey": "userDeliveryAddressId"
+    }
+  },
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY",
+      "property": "create"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "admin",
+      "permission": "ALLOW",
+      "property": "create"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "DENY",
+      "property": "deleteById"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "login"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "logout"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "findById"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "updateAttributes"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "confirm"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "resetPassword"
+    }
+  ],
+  "methods": []
+}

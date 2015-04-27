@@ -1,0 +1,73 @@
+{
+  "name": "Region",
+  "base": "PersistedModel",
+  "plural": "regions",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mongodb": {
+      "database": "db_pollexmom",
+      "collection": "c_regions"
+    },
+    "oracle": {
+      "schema": "S_POLLEXMOM",
+      "table": "T_REGION"
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "number",
+      "id": true,
+      "required": true,
+      "oracle": {
+        "columnName": "REGION_ID"
+      }
+    },
+    "name": {
+      "type": "string",
+      "required": true,
+      "oracle": {
+        "columnName": "REGION_NAME"
+      }
+    },
+    "created": {
+      "type": "date",
+      "oracle": {
+        "columnName": "CREATED"
+      }
+    },
+    "createdBy": {
+      "type": "number",
+      "oracle": {
+        "columnName": "CREATED_BY"
+      }
+    },
+    "modified": {
+      "type": "date",
+      "oracle": {
+        "columnName": "MODIFIED"
+      }
+    },
+    "modifiedBy": {
+      "type": "number",
+      "oracle": {
+        "columnName": "MODIFIED_BY"
+      }
+    }
+  },
+  "validations": [],
+  "relations": {
+    "city": {
+      "type": "belongsTo",
+      "model": "City",
+      "foreignKey": "cityId"
+    },
+    "towns": {
+      "type": "hasMany",
+      "model": "Town",
+      "foreignKey": "townId"
+    }
+  },
+  "acls": [],
+  "methods": []
+}

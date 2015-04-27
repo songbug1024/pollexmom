@@ -1,0 +1,73 @@
+{
+  "name": "City",
+  "base": "PersistedModel",
+  "plural": "cities",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mongodb": {
+      "database": "db_pollexmom",
+      "collection": "c_cities"
+    },
+    "oracle": {
+      "schema": "S_POLLEXMOM",
+      "table": "T_CITY"
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "number",
+      "id": true,
+      "required": true,
+      "oracle": {
+        "columnName": "CITY_ID"
+      }
+    },
+    "name": {
+      "type": "string",
+      "required": true,
+      "oracle": {
+        "columnName": "CITY_NAME"
+      }
+    },
+    "created": {
+      "type": "date",
+      "oracle": {
+        "columnName": "CREATED"
+      }
+    },
+    "createdBy": {
+      "type": "number",
+      "oracle": {
+        "columnName": "CREATED_BY"
+      }
+    },
+    "modified": {
+      "type": "date",
+      "oracle": {
+        "columnName": "MODIFIED"
+      }
+    },
+    "modifiedBy": {
+      "type": "number",
+      "oracle": {
+        "columnName": "MODIFIED_BY"
+      }
+    }
+  },
+  "validations": [],
+  "relations": {
+    "province": {
+      "type": "belongsTo",
+      "model": "Province",
+      "foreignKey": "provinceId"
+    },
+    "regions": {
+      "type": "hasMany",
+      "model": "Region",
+      "foreignKey": "regionId"
+    }
+  },
+  "acls": [],
+  "methods": []
+}
