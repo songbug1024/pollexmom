@@ -1,0 +1,67 @@
+{
+  "name": "ProductSpecification",
+  "base": "PersistedModel",
+  "plural": "product-specifications",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mongodb": {
+      "collection": "c_product_specifications"
+    }
+  },
+  "properties": {
+    "productId": {
+      "type": "number",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "price": {
+      "type": "number",
+      "required": true
+    },
+    "referencePrice": {
+      "type": "number"
+    },
+    "unit": {
+      "type": "string"
+    },
+    "inventoryCount": {
+      "type": "number",
+      "required": true
+    },
+    "saleCount": {
+      "type": "number"
+    },
+    "transportationCost": {
+      "type": "number"
+    },
+    "status": {
+      "type": "boolean"
+    },
+    "created": {
+      "type": "date"
+    },
+    "createdBy": {
+      "type": "number"
+    },
+    "modified": {
+      "type": "date"
+    },
+    "modifiedBy": {
+      "type": "number"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "product": {
+      "type": "belongsTo",
+      "model": "Product",
+      "foreignKey": "productId"
+    }
+  },
+  "acls": [],
+  "methods": []
+}

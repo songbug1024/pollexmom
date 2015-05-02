@@ -2,5 +2,23 @@
   "db": {
     "name": "db",
     "connector": "memory"
+  },
+  "mongodb": {
+    "host": "localhost",
+    "port": 27017,
+    "database": "pollexmom",
+    "username": "root",
+    "password": "",
+    "name": "mongodb",
+    "connector": "mongodb"
+  },
+  "mysql": {
+    "host": "localhost",
+    "port": 3306,
+    "database": "pollexmom",
+    "username": "root",
+    "password": "123456",
+    "name": "mysql",
+    "connector": "mysql"
   }
 }

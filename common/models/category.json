@@ -1,0 +1,46 @@
+{
+  "name": "Category",
+  "plural": "categories",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mongodb": {
+      "collection": "c_categories"
+    }
+  },
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "priority": {
+      "type": "number"
+    },
+    "parentId": {
+      "type": "number"
+    },
+    "desc": {
+      "type": "string"
+    },
+    "status": {
+      "type": "boolean"
+    },
+    "created": {
+      "type": "date"
+    },
+    "createdBy": {
+      "type": "number"
+    },
+    "modified": {
+      "type": "date"
+    },
+    "modifiedBy": {
+      "type": "number"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

@@ -1,12 +1,11 @@
 {
   "name": "Region",
-  "base": "PersistedModel",
   "plural": "regions",
+  "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true,
     "mongodb": {
-      "database": "db_pollexmom",
       "collection": "c_regions"
     },
     "oracle": {
@@ -15,14 +14,6 @@
     }
   },
   "properties": {
-    "id": {
-      "type": "number",
-      "id": true,
-      "required": true,
-      "oracle": {
-        "columnName": "REGION_ID"
-      }
-    },
     "name": {
       "type": "string",
       "required": true,

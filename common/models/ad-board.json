@@ -1,0 +1,46 @@
+{
+  "name": "AdBoard",
+  "plural": "ad-boards",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "priority": {
+      "type": "number",
+      "required": true
+    },
+    "previewImage": {
+      "type": "string",
+      "required": true
+    },
+    "href": {
+      "type": "string",
+      "required": true
+    },
+    "status": {
+      "type": "boolean"
+    },
+    "created": {
+      "type": "date"
+    },
+    "createdBy": {
+      "type": "number"
+    },
+    "modified": {
+      "type": "date"
+    },
+    "modifiedBy": {
+      "type": "number"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

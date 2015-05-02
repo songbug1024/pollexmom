@@ -1,0 +1,84 @@
+{
+  "name": "Order",
+  "base": "PersistedModel",
+  "plural": "orders",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mongodb": {
+      "collection": "c_orders"
+    }
+  },
+  "properties": {
+    "orderNumber": {
+      "type": "string",
+      "required": true
+    },
+    "consumerId": {
+      "type": "number",
+      "required": true
+    },
+    "dietitianId": {
+      "type": "number",
+      "required": true
+    },
+    "status": {
+      "type": "number",
+      "required": true
+    },
+    "shipperAddress": {
+      "type": "string",
+      "required": true
+    },
+    "receiverAddress": {
+      "type": "string",
+      "required": true
+    },
+    "payment": {
+      "type": "number",
+      "required": true
+    },
+    "shippingParty": {
+      "type": "number",
+      "required": true
+    },
+    "receivingParty": {
+      "type": "number",
+      "required": true
+    },
+    "provinceId": {
+      "type": "number"
+    },
+    "cityId": {
+      "type": "number"
+    },
+    "regionId": {
+      "type": "number"
+    },
+    "townId": {
+      "type": "number"
+    },
+    "created": {
+      "type": "date"
+    },
+    "createdBy": {
+      "type": "number"
+    },
+    "modified": {
+      "type": "date"
+    },
+    "modifiedBy": {
+      "type": "number"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "items": {
+      "type": "hasMany",
+      "model": "OrderItem",
+      "foreignKey": "orderItemId"
+    }
+  },
+  "acls": [],
+  "methods": []
+}

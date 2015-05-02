@@ -54,5 +54,37 @@
   "Town": {
     "dataSource": "mongodb",
     "public": true
+  },
+  "Category": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "Product": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "ProductSpecification": {
+    "dataSource": "mongodb",
+    "public": false
+  },
+  "ShoppingCart": {
+    "dataSource": "mongodb",
+    "public": false
+  },
+  "ShoppingCartItem": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "Order": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "OrderItem": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "AdBoard": {
+    "dataSource": "mongodb",
+    "public": true
   }
 }

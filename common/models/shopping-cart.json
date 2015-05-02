@@ -1,0 +1,30 @@
+{
+  "name": "ShoppingCart",
+  "base": "PersistedModel",
+  "plural": "shopping-carts",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mongodb": {
+      "collection": "c_shopping_carts"
+    }
+  },
+  "properties": {
+    "created": {
+      "type": "date"
+    },
+    "modified": {
+      "type": "date"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "items": {
+      "type": "hasMany",
+      "model": "ShoppingCartItem",
+      "foreignKey": "shoppingCartItemId"
+    }
+  },
+  "acls": [],
+  "methods": []
+}

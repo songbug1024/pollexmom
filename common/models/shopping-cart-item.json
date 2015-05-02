@@ -1,0 +1,57 @@
+{
+  "name": "ShoppingCartItem",
+  "base": "PersistedModel",
+  "plural": "shopping-cart-items",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mongodb": {
+      "collection": "c_shopping_cart_items"
+    }
+  },
+  "properties": {
+    "productId": {
+      "type": "number",
+      "required": true
+    },
+    "productName": {
+      "type": "string",
+      "required": true
+    },
+    "productPreviewImage": {
+      "type": "string",
+      "required": true
+    },
+    "specificationId": {
+      "type": "number",
+      "required": true
+    },
+    "price": {
+      "type": "number",
+      "required": true
+    },
+    "referencePrice": {
+      "type": "number"
+    },
+    "count": {
+      "type": "number",
+      "required": true
+    },
+    "created": {
+      "type": "date"
+    },
+    "modified": {
+      "type": "date"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "shoppingCart": {
+      "type": "belongsTo",
+      "model": "ShoppingCart",
+      "foreignKey": "shoppingCartId"
+    }
+  },
+  "acls": [],
+  "methods": []
+}

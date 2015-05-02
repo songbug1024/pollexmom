@@ -1,0 +1,61 @@
+{
+  "name": "OrderItem",
+  "base": "PersistedModel",
+  "plural": "order-items",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mongodb": {
+      "collection": "c_order_items"
+    }
+  },
+  "properties": {
+    "orderId": {
+      "type": "number",
+      "required": true
+    },
+    "productId": {
+      "type": "number",
+      "required": true
+    },
+    "productName": {
+      "type": "string",
+      "required": true
+    },
+    "productPreviewImage": {
+      "type": "string",
+      "required": true
+    },
+    "specificationId": {
+      "type": "number",
+      "required": true
+    },
+    "price": {
+      "type": "number",
+      "required": true
+    },
+    "referencePrice": {
+      "type": "number"
+    },
+    "count": {
+      "type": "number",
+      "required": true
+    },
+    "created": {
+      "type": "date"
+    },
+    "modified": {
+      "type": "date"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "order": {
+      "type": "belongsTo",
+      "model": "Order",
+      "foreignKey": "orderId"
+    }
+  },
+  "acls": [],
+  "methods": []
+}

@@ -1,0 +1,79 @@
+{
+  "name": "Product",
+  "plural": "products",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mongodb": {
+      "collection": "c_products"
+    }
+  },
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "catFirstLevel": {
+      "type": "number"
+    },
+    "catFirstLevelName": {
+      "type": "string"
+    },
+    "catSecondLevel": {
+      "type": "number"
+    },
+    "catSecondLevelName": {
+      "type": "string"
+    },
+    "catThirdLevel": {
+      "type": "number"
+    },
+    "catThirdLevelName": {
+      "type": "string"
+    },
+    "brand": {
+      "type": "string"
+    },
+    "desc": {
+      "type": "string"
+    },
+    "price": {
+      "type": "number"
+    },
+    "referencePrice": {
+      "type": "number"
+    },
+    "previewImages": {
+      "type": "string"
+    },
+    "detailImages": {
+      "type": "string"
+    },
+    "status": {
+      "type": "boolean"
+    },
+    "created": {
+      "type": "date"
+    },
+    "createdBy": {
+      "type": "number"
+    },
+    "modified": {
+      "type": "date"
+    },
+    "modifiedBy": {
+      "type": "number"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "specifications": {
+      "type": "hasMany",
+      "model": "ProductSpecification",
+      "foreignKey": "specificationId"
+    }
+  },
+  "acls": [],
+  "methods": []
+}
