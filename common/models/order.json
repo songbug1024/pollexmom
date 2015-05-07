@@ -62,13 +62,13 @@
       "type": "date"
     },
     "createdBy": {
-      "type": "number"
+      "type": "string"
     },
     "modified": {
       "type": "date"
     },
     "modifiedBy": {
-      "type": "number"
+      "type": "string"
     }
   },
   "validations": [],

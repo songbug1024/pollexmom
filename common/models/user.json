@@ -1,7 +1,7 @@
 {
   "name": "user",
   "plural": "users",
-  "base": "User",
+  "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true,
@@ -14,8 +14,13 @@
     }
   },
   "properties": {
+    "weChatId": {
+      "type": "string",
+      "index": {"unique": true}
+    },
     "username": {
       "type": "string",
+      "index": {"unique": true},
       "oracle": {
         "columnName": "USER_NAME"
       }
@@ -28,27 +33,23 @@
     },
     "email": {
       "type": "string",
+      "index": {"unique": true},
       "oracle": {
         "columnName": "USER_EMAIL"
       }
     },
-    "emailVerified": {
-      "type": "boolean",
-      "oracle": {
-        "columnName": "USER_EMAIL_VERIFIED"
-      }
-    },
-    "verificationToken": {
-      "type": "string",
-      "oracle": {
-        "columnName": "USER_EMAIL_VERIFICATION_TOKEN"
-      }
-    },
     "tel": {
       "type": "string",
+      "index": {"unique": true},
       "oracle": {
         "columnName": "USER_TEL"
       }
+    },
+    "roleName": {
+      "type": "string"
+    },
+    "feature": {
+      "type": "string"
     },
     "avatar": {
       "type": "string",
@@ -62,8 +63,26 @@
         "columnName": "USER_DESC"
       }
     },
+    "totalScore": {
+      "type": "number"
+    },
+    "refereeTel": {
+      "type": "string"
+    },
+    "genre": {
+      "type": "number",
+      "oracle": {
+        "columnName": "USER_GENRE"
+      }
+    },
+    "origin": {
+      "type": "number",
+      "oracle": {
+        "columnName": "USER_ORIGIN"
+      }
+    },
     "status": {
-      "type": "string",
+      "type": "number",
       "oracle": {
         "columnName": "USER_STATUS"
       }
@@ -75,24 +94,27 @@
       }
     },
     "createdBy": {
-      "type": "number",
+      "type": "string",
+      "defaultFn": "now",
       "oracle": {
         "columnName": "CREATED_BY"
       }
     },
     "modified": {
       "type": "date",
+      "defaultFn": "now",
       "oracle": {
         "columnName": "MODIFIED"
       }
     },
     "modifiedBy": {
-      "type": "number",
+      "type": "string",
       "oracle": {
         "columnName": "MODIFIED_BY"
       }
     }
   },
+  "hidden": ["password"],
   "validations": [],
   "relations": {
     "personalInfo": {
@@ -126,51 +148,31 @@
       "principalType": "ROLE",
       "principalId": "$everyone",
       "permission": "ALLOW",
-      "property": "create"
+      "property": ["register", "login", "logout", "confirm", "verify"]
     },
     {
       "principalType": "ROLE",
       "principalId": "$owner",
+      "permission": "DENY"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": ["updateAttributes"]
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "admin",
+      "permission": "ALLOW"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "admin",
       "permission": "DENY",
-      "property": "deleteById"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "ALLOW",
-      "property": "login"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "ALLOW",
-      "property": "logout"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$owner",
-      "permission": "ALLOW",
-      "property": "findById"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$owner",
-      "permission": "ALLOW",
-      "property": "updateAttributes"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "ALLOW",
-      "property": "confirm"
-    },
-    {
-      "accessType": "EXECUTE",
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "ALLOW",
-      "property": "resetPassword"
+      "property": ["deleteById"]
     }
   ],
-  "methods": []
+  "methods": [],
+  "indexes": {}
 }

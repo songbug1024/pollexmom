@@ -1,5 +1,6 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
+var path = require('path');
 
 var app = module.exports = loopback();
 
@@ -10,6 +11,11 @@ app.start = function() {
     console.log('Web server listening at: %s', app.get('url'));
   });
 };
+
+app.set('views', path.resolve(__dirname, 'views'));
+app.set('view engine', 'jade');
+
+app.use(loopback.static(path.resolve(__dirname, '../client')));
 
 // Bootstrap the application, configure models, datasources and middleware.
 // Sub-apps like REST API are mounted via boot scripts.

@@ -46,6 +46,7 @@
     },
     "created": {
       "type": "date",
+      "defaultFn": "now",
       "oracle": {
         "columnName": "CREATED"
       }

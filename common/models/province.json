@@ -28,7 +28,7 @@
       }
     },
     "createdBy": {
-      "type": "number",
+      "type": "string",
       "oracle": {
         "columnName": "CREATED_BY"
       }
@@ -41,7 +41,7 @@
       }
     },
     "modifiedBy": {
-      "type": "number",
+      "type": "string",
       "oracle": {
         "columnName": "MODIFIED_BY",
         "nullable": "Y"

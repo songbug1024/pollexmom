@@ -30,17 +30,28 @@
       "type": "date"
     },
     "createdBy": {
-      "type": "number"
+      "type": "string"
     },
     "modified": {
       "type": "date"
     },
     "modifiedBy": {
-      "type": "number"
+      "type": "string"
     }
   },
   "validations": [],
   "relations": {},
-  "acls": [],
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "admin",
+      "permission": "ALLOW"
+    }
+  ],
   "methods": []
 }
