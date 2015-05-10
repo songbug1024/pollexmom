@@ -51,7 +51,7 @@
     "region": {
       "type": "belongsTo",
       "model": "Region",
-      "foreignKey": "regionId"
+      "foreignKey": "townId"
     }
   },
   "acls": [],

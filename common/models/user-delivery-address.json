@@ -106,7 +106,7 @@
     "user": {
       "type": "belongsTo",
       "model": "user",
-      "foreignKey": "userId"
+      "foreignKey": "userDeliveryAddressId"
     }
   },
   "acls": [],

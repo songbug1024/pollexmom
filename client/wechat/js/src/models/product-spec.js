@@ -19,7 +19,7 @@ module.exports = Model.extend({
   },
   purchasable: function (count) {
     return count > 0
-      && count <= this.get('limitPurchaseCount')
+//      && count <= this.get('limitPurchaseCount') // TODO
       && (this.get('inventoryCount') - count) >= 0;
   }
 });

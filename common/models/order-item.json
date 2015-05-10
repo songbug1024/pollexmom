@@ -10,10 +10,6 @@
     }
   },
   "properties": {
-    "orderId": {
-      "type": "number",
-      "required": true
-    },
     "productId": {
       "type": "number",
       "required": true
@@ -53,7 +49,7 @@
     "order": {
       "type": "belongsTo",
       "model": "Order",
-      "foreignKey": "orderId"
+      "foreignKey": "orderItemId"
     }
   },
   "acls": [],

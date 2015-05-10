@@ -42,8 +42,8 @@
 <div class="w_good clearfix">
     <div class="w">
         <ul class="good_buy clearfix">
-            <li><a class="good_btn_go" href="#">加入购物车</a></li>
-            <li><a class="good_btn_buy" href="#">立即购买</a></li>
+            <li><a class="good_btn_go" href="javascript:void(0);">加入购物车</a></li>
+            <li><a class="good_btn_buy" href="javascript:void(0);">立即购买</a></li>
         </ul>
     </div>
 </div>

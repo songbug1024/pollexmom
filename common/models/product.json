@@ -71,7 +71,7 @@
     "specifications": {
       "type": "hasMany",
       "model": "ProductSpecification",
-      "foreignKey": "specificationId"
+      "foreignKey": "productId"
     }
   },
   "acls": [],

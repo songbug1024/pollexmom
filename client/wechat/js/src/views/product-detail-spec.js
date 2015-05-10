@@ -10,6 +10,10 @@ var $ = require('jquery');
 var _ = require('underscore');
 var View = require('../base/view');
 var template = require('../templates/product-detail-spec.tpl');
+var ShoppingCartModel = require('../models/shopping-cart');
+var ShoppingCartItemModel = require('../models/shopping-cart-item');
+var Settings = require('../settings.json');
+var async = require('async');
 
 module.exports = View.extend({
   name: 'ProductDetailSpec',
@@ -18,7 +22,8 @@ module.exports = View.extend({
   events: {
     'click .good_ggchioce>li': 'switchSpecEvent',
     'click .good_num .decrease': 'decreaseNumEvent',
-    'click .good_num .increase': 'increaseNumEvent'
+    'click .good_num .increase': 'increaseNumEvent',
+    'click .good_btn_go': 'addIntoShoppingCartEvent'
   },
   initialize: function () {
     this.listenTo(this.model.get('chooseSpecModel'), 'change', this.render);
@@ -65,5 +70,141 @@ module.exports = View.extend({
   },
   increaseNumEvent: function (e) {
     this.setPurchaseNum(e, true);
+  },
+  addIntoShoppingCartEvent: function (e) {
+    var chooseSpecIndex = this.model.get('chooseSpecIndex');
+    var chooseSpecModel = this.model.get('chooseSpecModel');
+    var selected = chooseSpecIndex >= 0 && chooseSpecModel.id && !_.isEmpty(chooseSpecModel.attributes);
+
+    if (!selected) {
+      // TODO show waring
+      console.warn('Not selected!!!')
+    } else {
+      var count = parseInt(this.$el.find('.good_num>input').val());
+      if (!chooseSpecModel.purchasable(count)) {
+        return console.error('Count is invalid!');
+      }
+
+      var shoppingCartItemModel = new ShoppingCartItemModel({
+        productId: this.model.id,
+        productName: this.model.get('name'),
+        productPreviewImage: this.model.get('previewImagesJson')[0] || '',
+        specificationId: chooseSpecModel.id,
+        price: chooseSpecModel.get('price'),
+        referencePrice: chooseSpecModel.get('referencePrice'),
+        count: count
+      });
+
+      var storedShoppingCart = localStorage.getItem(Settings.locals.userShoppingCart);
+      if (storedShoppingCart) {
+        storedShoppingCart = JSON.parse(storedShoppingCart);
+
+        var productId = shoppingCartItemModel.get('productId');
+        var specificationId = shoppingCartItemModel.get('specificationId');
+        var items = storedShoppingCart.items;
+        var existedItem = _.findWhere(items, {productId: productId, specificationId: specificationId});
+
+        if (existedItem) {
+          existedItem.count += shoppingCartItemModel.get('count');
+          shoppingCartItemModel.set(existedItem);
+        } else {
+          shoppingCartItemModel.set('shoppingCartId', storedShoppingCart.id);
+        }
+
+        shoppingCartItemModel.save(shoppingCartItemModel.attributes, {
+          success: function (model) {
+            if (!existedItem) {
+              storedShoppingCart.items.push(model.attributes);
+            }
+            alert('添加成功!');
+            console.log('Added into shopping cart success!', model);
+            localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(storedShoppingCart));
+          },
+          error: function (model, err) {
+            console.error('Error: ' + err);
+            alert('添加失败!');
+          }
+        });
+
+      } else {
+
+        async.waterfall([
+          function checkShoppingCart(callback){
+            var shoppingCartModel = new ShoppingCartModel({userId: Settings.userId});
+
+            shoppingCartModel.url = shoppingCartModel.checkUrl();
+            shoppingCartModel.fetch({
+              success: function (model) {
+                callback(null, model);
+              },
+              error: function (model, err) {
+                if (err.status === 500) {
+                  return callback(err, model);
+                }
+
+                // not create shopping cart before
+                model.url = model.urlRoot();
+                model.save(model.attributes, {
+                  success: function (model) {
+                    callback(null, model);
+                  },
+                  error: function (model, err) {
+                    callback(err);
+                  }
+                });
+
+              }
+            });
+          },
+          function loadItems(shoppingCart, callback) {
+            shoppingCart.url = shoppingCart.userRelationUrl();
+            shoppingCart.fetch({
+              success: function (model) {
+                callback(null, model);
+              },
+              error: function (model, err) {
+                callback(err);
+              }
+            });
+          },
+          function saveItem(shoppingCart, callback) {
+            var productId = shoppingCartItemModel.get('productId');
+            var specificationId = shoppingCartItemModel.get('specificationId');
+            var items = shoppingCart.get('items');
+            var existedItem = _.findWhere(items, {productId: productId, specificationId: specificationId});
+
+            if (existedItem) {
+              existedItem.count += shoppingCartItemModel.get('count');
+              shoppingCartItemModel.set(existedItem);
+            } else {
+              shoppingCartItemModel.set('shoppingCartId', shoppingCart.id);
+            }
+
+            shoppingCartItemModel.save(shoppingCartItemModel.attributes, {
+              patch: true,
+              success: function (model) {
+                callback(null, model, shoppingCart, !existedItem);
+              },
+              error: function (model, err) {
+                callback(err);
+              }
+            });
+          }
+        ], function (err, model, shoppingCart, append) {
+          if (err) {
+            alert('添加失败!');
+            return console.error('Error: ' + err);
+          }
+          console.log('Added into shopping cart success!', model);
+
+          if (append) {
+            shoppingCart.get('items').push(model.attributes);
+          }
+          localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(shoppingCart.toJSON()));
+          alert('添加成功!');
+        });
+
+      }
+    }
   }
 });

@@ -21,6 +21,8 @@ module.exports = Backbone.View.extend({
   },
   constructor: function() {
     Backbone.View.apply(this, arguments);
+
+    this.on('refresh', this.render);
   },
   initialize: function () {
     if (Settings.env === 'debug') {

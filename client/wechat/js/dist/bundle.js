@@ -20,7 +20,7 @@ var IndexRoute = require('./routers/index');
 new IndexRoute();
 
 Backbone.history.start({pushState: false, root: "/wechat/"});
-},{"./routers/index":13,"backbone":31,"jquery":33,"underscore":34}],2:[function(require,module,exports){
+},{"./routers/index":17,"backbone":46,"jquery":49,"underscore":50}],2:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -55,7 +55,7 @@ _.extend(Collection, RestQueryString, {
 });
 
 module.exports = Backbone.Collection.extend(Collection);
-},{"../settings.json":14,"./rest-querystring":5,"backbone":31,"underscore":34}],3:[function(require,module,exports){
+},{"../settings.json":18,"./rest-querystring":5,"backbone":46,"underscore":50}],3:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -92,7 +92,7 @@ _.extend(Model, RestQueryString, {
 });
 
 module.exports = Backbone.Model.extend(Model);
-},{"../settings.json":14,"./rest-querystring":5,"backbone":31,"underscore":34}],4:[function(require,module,exports){
+},{"../settings.json":18,"./rest-querystring":5,"backbone":46,"underscore":50}],4:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -105,7 +105,7 @@ module.exports = View.extend({
   role: 'page',
   className: 'page'
 });
-},{"../settings.json":14,"./view":7}],5:[function(require,module,exports){
+},{"../settings.json":18,"./view":7}],5:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -283,7 +283,7 @@ module.exports = {
     return this;
   }
 };
-},{"../settings.json":14,"underscore":34}],6:[function(require,module,exports){
+},{"../settings.json":18,"underscore":50}],6:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -296,7 +296,7 @@ module.exports = Backbone.Router.extend({
 
   }
 });
-},{"backbone":31}],7:[function(require,module,exports){
+},{"backbone":46}],7:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -320,6 +320,8 @@ module.exports = Backbone.View.extend({
   },
   constructor: function() {
     Backbone.View.apply(this, arguments);
+
+    this.on('refresh', this.render);
   },
   initialize: function () {
     if (Settings.env === 'debug') {
@@ -327,7 +329,7 @@ module.exports = Backbone.View.extend({
     }
   }
 });
-},{"../settings.json":14,"backbone":31}],8:[function(require,module,exports){
+},{"../settings.json":18,"backbone":46}],8:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -358,18 +360,18 @@ module.exports = Collection.extend({
     return m1.get('priority') < m2.get('priority');
   }
 });
-},{"../base/collection":2,"../models/ad-board":10,"../settings.json":14}],9:[function(require,module,exports){
+},{"../base/collection":2,"../models/ad-board":11,"../settings.json":18}],9:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
  * @Date: 2015/5/9
  */
 var Collection = require('../base/collection');
-var Product = require('../models/product');
+var Model = require('../models/product');
 
 module.exports = Collection.extend({
   name: 'Product',
-  model: Product,
+  model: Model,
   urlRoot: function () {
     return this.baseUrl + 'products';
   },
@@ -389,7 +391,23 @@ module.exports = Collection.extend({
     return this.urlRoot() + '?' + queryString;
   }
 });
-},{"../base/collection":2,"../models/product":12}],10:[function(require,module,exports){
+},{"../base/collection":2,"../models/product":13}],10:[function(require,module,exports){
+/**
+ * @Description:
+ * @Author: fuwensong
+ * @Date: 2015/5/9
+ */
+var Collection = require('../base/collection');
+var Model = require('../models/shopping-cart-item');
+
+module.exports = Collection.extend({
+  name: 'ShoppingCartItem',
+  model: Model,
+  urlRoot: function () {
+    return this.baseUrl + 'shopping-cart-items';
+  }
+});
+},{"../base/collection":2,"../models/shopping-cart-item":14}],11:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -403,7 +421,7 @@ module.exports = Model.extend({
     return this.baseUrl + 'ad-boards';
   }
 });
-},{"../base/model":3}],11:[function(require,module,exports){
+},{"../base/model":3}],12:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -425,11 +443,11 @@ module.exports = Model.extend({
   },
   purchasable: function (count) {
     return count > 0
-      && count <= this.get('limitPurchaseCount')
+//      && count <= this.get('limitPurchaseCount') // TODO
       && (this.get('inventoryCount') - count) >= 0;
   }
 });
-},{"../base/model":3}],12:[function(require,module,exports){
+},{"../base/model":3}],13:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -485,7 +503,110 @@ module.exports = Model.extend({
     }
   }
 });
-},{"../base/model":3,"./product-spec":11,"underscore":34}],13:[function(require,module,exports){
+},{"../base/model":3,"./product-spec":12,"underscore":50}],14:[function(require,module,exports){
+/**
+ * @Description:
+ * @Author: fuwensong
+ * @Date: 2015/5/9
+ */
+var Model = require('../base/model');
+
+module.exports = Model.extend({
+  name: 'ShoppingCart',
+  urlRoot: function () {
+    return this.baseUrl + 'shopping-cart-items';
+  },
+  initialize: function () {
+  },
+  url: function () {
+    return this.urlRoot() + (this.id ? ('/' + this.id) : '');
+  },
+  shoppingCartRelationUrl: function () {
+    var shoppingCartId = this.get('shoppingCartId');
+    if (!shoppingCartId) {
+      console.error('Model \'' + this.name + '\' shoppingCartRelationUrl error: shoppingCartId is invalid.');
+    }
+    return this.baseUrl + 'shopping-carts/'+ shoppingCartId + '/items';
+  }
+});
+},{"../base/model":3}],15:[function(require,module,exports){
+/**
+ * @Description:
+ * @Author: fuwensong
+ * @Date: 2015/5/9
+ */
+var Model = require('../base/model');
+
+module.exports = Model.extend({
+  name: 'ShoppingCart',
+  defaults: {
+    items: [],
+    amountPrice: 0,
+    checkPrice: 0
+  },
+  urlRoot: function () {
+    return this.baseUrl + 'shopping-carts';
+  },
+  initialize: function () {
+
+  },
+  url: function () {
+    return this.urlRoot() + '/' + this.id;
+  },
+  userRelationUrl: function () {
+    var userId = this.get('userId');
+    if (!userId) {
+      console.error('Model \'' + this.name + '\' userRelationUrl error: userId is invalid.');
+    }
+
+    return this.urlRoot() + '/with-items?userId=' + userId;
+  },
+  checkUrl: function () {
+    var userId = this.get('userId');
+    if (!userId) {
+      console.error('Model \'' + this.name + '\' checkUrl error: userId is invalid.');
+    }
+
+    return this.baseUrl + 'users/' + userId + '/shoppingCart/';
+  },
+  resetAmountPrice: function () {
+    var amount = 0;
+    var items = this.get('items');
+    if (items && items.length > 0) {
+      for (var i in items) {
+        amount += (items[i].price * items[i].count);
+      }
+    }
+    this.set('amountPrice', amount);
+  }
+});
+},{"../base/model":3}],16:[function(require,module,exports){
+/**
+ * @Description:
+ * @Author: fuwensong
+ * @Date: 2015/5/9
+ */
+var _ = require('underscore');
+var Model = require('../base/model');
+
+module.exports = Model.extend({
+  name: 'User',
+  defaults: {
+  },
+  urlRoot: function () {
+    return this.baseUrl + 'users';
+  },
+  initialize: function () {
+
+  },
+  url: function () {
+    return this.urlRoot() + '/' + this.id;
+  },
+  personalInfoUrl: function() {
+    return this.urlRoot() + '/personal-info?id=' + this.id;
+  }
+});
+},{"../base/model":3,"underscore":50}],17:[function(require,module,exports){
 /**
  * @Description: Index Route
  * @Author: fuwensong
@@ -498,20 +619,27 @@ var Settings = require('../settings.json');
 var ProductModel = require('../models/product');
 var IndexPageView = require('../views/page-index');
 var ProductPageView = require('../views/page-product');
+var PersonalCenterView = require('../views/page-personal-center');
+var PersonalInfoView = require('../views/page-personal-info');
+var ShoppingCartView = require('../views/page-shopping-cart');
 
 module.exports = Router.extend({
   routes: {
     "": "index",
-    "product/:productId": "productDetail"
+    "product/:productId": "productDetail",
+    "personal-center": "personalCenter",
+    "personal-info": "personalInfo",
+    "shopping-cart": "shoppingCart"
+
   },
   initialize: function (options) {
 
   },
   index: function() {
     changePage({
-      selector: '#index-page',
-      elCreator: function (options) {
-        return new IndexPageView(options).render().el;
+      id: 'index-page',
+      viewCreator: function (options) {
+        return new IndexPageView(options).render();
       }
     });
   },
@@ -526,60 +654,116 @@ module.exports = Router.extend({
       existedPageEl.remove();
     }
     changePage({
-      selector: '#product-detail-page',
-      elCreator: function (options) {
-        return new ProductPageView(options).el;
+      id: 'product-detail-page',
+      viewCreator: function (options) {
+        return new ProductPageView(options);
       },
-      elCreatorOptions: {model: new ProductModel(product)}
+      viewCreatorOptions: {model: new ProductModel(product)}
     });
-
+  },
+  personalCenter: function() {
+    changePage({
+      id: 'persnal-center-page',
+      viewCreator: function (options) {
+        return new PersonalCenterView(options);
+      }
+    });
+  },
+  personalInfo: function() {
+    changePage({
+      id: 'personal-info-page',
+      viewCreator: function (options) {
+        return new PersonalInfoView(options);
+      }
+    });
+  },
+  shoppingCart: function() {
+    changePage({
+      id: 'shopping-cart-page',
+      viewCreator: function (options) {
+        return new ShoppingCartView(options);
+      },
+      cache: true,
+      refresh: true
+    });
   }
 });
 
+var allPages = {};
+
 function changePage(options) {
   options = options || {};
-  var selector = options.selector;
-  var elCreator = options.elCreator;
-  var existedPage = $(selector);
+  var id = options.id;
+  var viewCreator = options.viewCreator;
+  var existedPage = $('#' + id);
+  var view;
+
   if (!existedPage || existedPage.length <= 0) {
-    var el = elCreator(options.elCreatorOptions);
-    $('body').append(el);
-    existedPage = $(el);
+    view = viewCreator(options.viewCreatorOptions);
+    $('body').attr('data-page', id).append(view.el);
+    existedPage = view.$el;
+
+    if (options.cache) {
+      allPages[id] = view;
+    }
+
+  } else {
+    if (options.refresh && allPages[id]) {
+      allPages[id].trigger('refresh');
+    }
   }
   $('body .active[data-role="page"]').removeClass('active');
   existedPage.addClass('active');
 }
-},{"../base/router":6,"../models/product":12,"../settings.json":14,"../views/page-index":26,"../views/page-product":27,"jquery":33,"underscore":34}],14:[function(require,module,exports){
+},{"../base/router":6,"../models/product":13,"../settings.json":18,"../views/page-index":35,"../views/page-personal-center":36,"../views/page-personal-info":37,"../views/page-product":38,"../views/page-shopping-cart":39,"jquery":49,"underscore":50}],18:[function(require,module,exports){
 module.exports={
   "apiRoot": "/api/",
   "env": "debug",
   "adBoardSize": 3,
+  "userId": "554f0563f0daa4001b3005ed",
   "locals": {
-    "indexProducts": "indexProducts"
+    "indexProducts": "pollexmom_indexProducts",
+    "userInfo": "pollexmom_userInfo",
+    "userShoppingCart": "pollexmom_userShoppingCart"
   }
 }
-},{}],15:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 module.exports = "<div class=\"clear\"></div>\r\n<div class=\"blank10\"></div>\r\n<div id=\"{{=sliderId}}\" class=\"slideBox\">\r\n    <div class=\"bd\">\r\n        <ul>\r\n            {{\r\n                for (var i in items) {\r\n            }}\r\n                <li data-priority=\"{{=items[i].priority}}\">\r\n                    <a class=\"pic\" href=\"{{=items[i].href}}\" title=\"{{=items[i].name}}\">\r\n                        <img src=\"{{=items[i].previewImage}}\" />\r\n                    </a>\r\n                </li>\r\n            {{\r\n                }\r\n            }}\r\n        </ul>\r\n    </div>\r\n    <div class=\"hd\"><ul></ul></div>\r\n</div>";
 
-},{}],16:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports = "<div class=\"clear\"></div>\r\n<ul class=\"index_plist\">\r\n    <div><li><img src=\"images/btn_d1.png\"></li></div>\r\n    <div><li><a href=\"index2.html\"><img src=\"images/index_p1.png\"></a></li></div>\r\n    <div><li><a href=\"index3.html\"><img src=\"images/index_p2.png\"></a></li></div>\r\n    <div><li><img src=\"images/btn_d2.png\"></li></div>\r\n</ul>";
 
-},{}],17:[function(require,module,exports){
-module.exports = "<div class=\"blank66\"></div>\r\n<footer class=\"top_bar\">\r\n    <nav>\r\n        <ul id=\"top_menu\" class=\"top_menu\">\r\n            <li class=\"home\"><a href=\"#\"></a></li>\r\n            <li><a href=\"#\"><img src=\"images/navimg1.png\"><label>分类</label></a></li>\r\n            <li><a href=\"#\"><img src=\"images/navimg2.png\"><label>个人中心</label></a></li>\r\n            <li><a href=\"#\"><img src=\"images/navimg3.png\"><label>购物车</label></a></li>\r\n            <li><a href=\"#\"><img src=\"images/navimg4.png\"><label>搜索</label></a></li>\r\n        </ul>\r\n    </nav>\r\n</footer>";
-
-},{}],18:[function(require,module,exports){
-module.exports = "<div class=\"index_topimg\"><img src=\"images/top.png\"></div>\r\n<div class=\"index_btn_so\"><a href=\"#\"></a></div>\r\n<div class=\"clear\"></div>\r\n";
-
-},{}],19:[function(require,module,exports){
-module.exports = "<div class=\"w\">\r\n    <div class=\"good_box1\">\r\n        <h1 class=\"good_tit\"><span>{{=product.name}}</span></h1>\r\n        <p class=\"goog_jg\">商城价格：<i>￥{{=product.chooseSpecIndex >= 0 ? chooseSpec.price : product.price}}</i></p>\r\n        {{\r\n            if (chooseSpec.transportationCost > 0) {\r\n        }}\r\n            <p class=\"good_yf\">运费：￥{{=chooseSpec.transportationCost}}</p>\r\n        {{\r\n            } else {\r\n        }}\r\n            <p class=\"good_yf\">无运费</p>\r\n        {{\r\n            }\r\n        }}\r\n    </div>\r\n</div>\r\n<div class=\"w_good clearfix\">\r\n    <div class=\"w\">\r\n        <ul class=\"good_ggchioce clearfix\">\r\n            {{\r\n                for (var i in product.specifications) {\r\n            }}\r\n                    <li class=\"choose\">{{=product.specifications[i].name}}</li>\r\n            {{\r\n                }\r\n            }}\r\n        </ul>\r\n    </div>\r\n</div>\r\n<div class=\"w_good clearfix\">\r\n    <div class=\"w\">\r\n        <div class=\"good_num clearfix\">\r\n            <span class=\"good_ltitle\">数量：</span>\r\n            <a class=\"decrease\" href=\"javascript:;\">-</a>\r\n            <input type=\"text\" value=\"1\" id=\"prosum\">\r\n            <a class=\"increase\" href=\"javascript:;\">+</a>\r\n            <span class=\"good_yh\">{{=product.chooseSpecIndex < 0 || chooseSpec.inventoryCount > 0 ? '有货' : '缺货'}}</span>\r\n        </div>\r\n    </div>\r\n</div>\r\n<div class=\"w_good clearfix\">\r\n    <div class=\"w\">\r\n        <ul class=\"good_buy clearfix\">\r\n            <li><a class=\"good_btn_go\" href=\"#\">加入购物车</a></li>\r\n            <li><a class=\"good_btn_buy\" href=\"#\">立即购买</a></li>\r\n        </ul>\r\n    </div>\r\n</div>";
-
-},{}],20:[function(require,module,exports){
-module.exports = "<div class=\"good_pic\">\r\n    <div id=\"{{=sliderId}}\" class=\"slideBox_good\">\r\n        <div class=\"bd\">\r\n            <ul>\r\n            {{\r\n                for (var i in product.previewImagesJson) {\r\n            }}\r\n                <li><img src=\"{{=product.previewImagesJson[i]}}\" /></li>\r\n            {{\r\n                }\r\n            }}\r\n            </ul>\r\n        </div>\r\n        <div class=\"hd\"><ul></ul></div>\r\n    </div>\r\n</div>\r\n{{\r\n    var specNames = '';\r\n    for (var i in product.specifications) {\r\n        specNames += product.specifications[i].name + '  ';\r\n    }\r\n}}\r\n<div class=\"spec-detail w\">\r\n    <div class=\"good_tab\">\r\n        <ul id=\"myTab0\" class=\"good_tabT clearfix\">\r\n            <li class=\"active btn-spec\">规格参数</li>\r\n            <li class=\"normal btn-images\">商品图片</li>\r\n        </ul>\r\n    </div>\r\n    <div id=\"myTab0_Content0\" class=\"tab-spec good_cs\">\r\n        <div class=\"good_cont\">\r\n            ·品牌：{{=product.brand}}<br>\r\n            ·产品名称：{{=product.name}}<br>\r\n            ·适用年龄：6-12个月<br>\r\n            ·规格：{{=specNames}}<br>\r\n            {{=product.desc}}\r\n        </div>\r\n    </div>\r\n    <div id=\"myTab0_Content1\" class=\"tab-images good_cs none\">\r\n        <div class=\"good_cont\">\r\n        {{\r\n            for (var i in product.detailImagesJson) {\r\n        }}\r\n            <p><img data-src=\"{{=product.detailImagesJson[i]}}\" /></p>\r\n        {{\r\n            }\r\n        }}\r\n            <p>\r\n                ·品牌：{{=product.brand}}<br>\r\n                ·产品名称：{{=product.name}}<br>\r\n                ·适用年龄：6-12个月<br>\r\n                ·规格：{{=specNames}}<br>\r\n                {{=product.desc}}\r\n            </p>\r\n        </div>\r\n    </div>\r\n</div>";
-
 },{}],21:[function(require,module,exports){
-module.exports = "<dl class=\"p_list\">\r\n    <dt>\r\n        <a href=\"#product/{{=id}}\">\r\n            <img src=\"{{=previewImagesJson && previewImagesJson.length > 0 ? previewImagesJson[0] : ''}}\">\r\n        </a>\r\n    </dt>\r\n    <dd>\r\n        <p class=\"p_title\"><a href=\"#product/{{=id}}\">{{=name}}</a></p>\r\n        <p class=\"p_price\">￥{{=price}}</p>\r\n    </dd>\r\n</dl>";
+module.exports = "<div class=\"blank66\"></div>\r\n<footer class=\"top_bar\">\r\n    <nav>\r\n        <ul id=\"top_menu\" class=\"top_menu\">\r\n            <li class=\"home\"><a href=\"#\"></a></li>\r\n            <li><a href=\"#\"><img src=\"images/navimg1.png\"><label>分类</label></a></li>\r\n            <li><a href=\"#personal-center\"><img src=\"images/navimg2.png\"><label>个人中心</label></a></li>\r\n            <li><a href=\"#shopping-cart\"><img src=\"images/navimg3.png\"><label>购物车</label></a></li>\r\n            <li><a href=\"#\"><img src=\"images/navimg4.png\"><label>搜索</label></a></li>\r\n        </ul>\r\n    </nav>\r\n</footer>";
 
 },{}],22:[function(require,module,exports){
+module.exports = "<div class=\"index_topimg\"><img src=\"images/top.png\"></div>\r\n<div class=\"index_btn_so\"><a href=\"#\"></a></div>\r\n<div class=\"clear\"></div>\r\n";
+
+},{}],23:[function(require,module,exports){
+module.exports = "<div class=\"user_center\">\r\n    <h1 class=\"user_face\"><img src=\"{{=avatar}}\"></h1>\r\n    <h2 class=\"user_nicheng\">{{=username}}</h2>\r\n</div>\r\n<div class=\"top2 clearfix\">\r\n    <!--<h2 class=\"top2_titleimg\"><img src=\"images/btn_person.png\" width=\"65\" height=\"65\"></h2>-->\r\n    <ul class=\"top2_list\">\r\n        <li><a href=\"#personal-info\"><p><img src=\"images/btn_person.png\" width=\"65\" height=\"65\"></p><p>个人信息</p></a></li>\r\n        <li class=\"top2_listli2\"><a href=\"#myorders\"><p><img src=\"images/btn_dingdan.png\" width=\"65\" height=\"65\"></p><p>我的订单</p></a></li>\r\n        <li><a href=\"#shopping-cart\"><p><img src=\"images/btn_gwc.png\" width=\"65\" height=\"65\"></p><p>购物车</p></a></li>\r\n    </ul>\r\n</div>";
+
+},{}],24:[function(require,module,exports){
+module.exports = "<div class=\"top2 clearfix\">\r\n    <h2 class=\"top2_titleimg\"><img src=\"{{=avatar}}\" width=\"65\" height=\"65\"></h2>\r\n</div>\r\n<h1 class=\"top_title\">个人信息</h1>\r\n\r\n<div class=\"w\">\r\n    <div class=\"user_xinxi\">\r\n        <ul class=\"user_xinxi_item clearfix\">\r\n            <li>会员编号：</li>\r\n            <li>{{=userNumber}}</li>\r\n        </ul>\r\n        <ul class=\"user_xinxi_item clearfix\">\r\n            <li>姓名：</li>\r\n            <li>{{=personalInfo.realName || username}}</li>\r\n        </ul>\r\n        <ul class=\"user_xinxi_item clearfix\">\r\n            <li>手机号：</li>\r\n            <li>{{=tel}}</li>\r\n        </ul>\r\n        <ul class=\"user_xinxi_item clearfix\">\r\n            <li>出生日期：</li>\r\n            <li>{{=personalInfo.birthday || \"未知\"}}</li>\r\n        </ul>\r\n    </div>\r\n</div>";
+
+},{}],25:[function(require,module,exports){
+module.exports = "<div class=\"w\">\r\n    <div class=\"good_box1\">\r\n        <h1 class=\"good_tit\"><span>{{=product.name}}</span></h1>\r\n        <p class=\"goog_jg\">商城价格：<i>￥{{=product.chooseSpecIndex >= 0 ? chooseSpec.price : product.price}}</i></p>\r\n        {{\r\n            if (chooseSpec.transportationCost > 0) {\r\n        }}\r\n            <p class=\"good_yf\">运费：￥{{=chooseSpec.transportationCost}}</p>\r\n        {{\r\n            } else {\r\n        }}\r\n            <p class=\"good_yf\">无运费</p>\r\n        {{\r\n            }\r\n        }}\r\n    </div>\r\n</div>\r\n<div class=\"w_good clearfix\">\r\n    <div class=\"w\">\r\n        <ul class=\"good_ggchioce clearfix\">\r\n            {{\r\n                for (var i in product.specifications) {\r\n            }}\r\n                    <li class=\"choose\">{{=product.specifications[i].name}}</li>\r\n            {{\r\n                }\r\n            }}\r\n        </ul>\r\n    </div>\r\n</div>\r\n<div class=\"w_good clearfix\">\r\n    <div class=\"w\">\r\n        <div class=\"good_num clearfix\">\r\n            <span class=\"good_ltitle\">数量：</span>\r\n            <a class=\"decrease\" href=\"javascript:;\">-</a>\r\n            <input type=\"text\" value=\"1\" id=\"prosum\">\r\n            <a class=\"increase\" href=\"javascript:;\">+</a>\r\n            <span class=\"good_yh\">{{=product.chooseSpecIndex < 0 || chooseSpec.inventoryCount > 0 ? '有货' : '缺货'}}</span>\r\n        </div>\r\n    </div>\r\n</div>\r\n<div class=\"w_good clearfix\">\r\n    <div class=\"w\">\r\n        <ul class=\"good_buy clearfix\">\r\n            <li><a class=\"good_btn_go\" href=\"javascript:void(0);\">加入购物车</a></li>\r\n            <li><a class=\"good_btn_buy\" href=\"javascript:void(0);\">立即购买</a></li>\r\n        </ul>\r\n    </div>\r\n</div>";
+
+},{}],26:[function(require,module,exports){
+module.exports = "<div class=\"good_pic\">\r\n    <div id=\"{{=sliderId}}\" class=\"slideBox_good\">\r\n        <div class=\"bd\">\r\n            <ul>\r\n            {{\r\n                for (var i in product.previewImagesJson) {\r\n            }}\r\n                <li><img src=\"{{=product.previewImagesJson[i]}}\" /></li>\r\n            {{\r\n                }\r\n            }}\r\n            </ul>\r\n        </div>\r\n        <div class=\"hd\"><ul></ul></div>\r\n    </div>\r\n</div>\r\n{{\r\n    var specNames = '';\r\n    for (var i in product.specifications) {\r\n        specNames += product.specifications[i].name + '  ';\r\n    }\r\n}}\r\n<div class=\"spec-detail w\">\r\n    <div class=\"good_tab\">\r\n        <ul id=\"myTab0\" class=\"good_tabT clearfix\">\r\n            <li class=\"active btn-spec\">规格参数</li>\r\n            <li class=\"normal btn-images\">商品图片</li>\r\n        </ul>\r\n    </div>\r\n    <div id=\"myTab0_Content0\" class=\"tab-spec good_cs\">\r\n        <div class=\"good_cont\">\r\n            ·品牌：{{=product.brand}}<br>\r\n            ·产品名称：{{=product.name}}<br>\r\n            ·适用年龄：6-12个月<br>\r\n            ·规格：{{=specNames}}<br>\r\n            {{=product.desc}}\r\n        </div>\r\n    </div>\r\n    <div id=\"myTab0_Content1\" class=\"tab-images good_cs none\">\r\n        <div class=\"good_cont\">\r\n        {{\r\n            for (var i in product.detailImagesJson) {\r\n        }}\r\n            <p><img data-src=\"{{=product.detailImagesJson[i]}}\" /></p>\r\n        {{\r\n            }\r\n        }}\r\n            <p>\r\n                ·品牌：{{=product.brand}}<br>\r\n                ·产品名称：{{=product.name}}<br>\r\n                ·适用年龄：6-12个月<br>\r\n                ·规格：{{=specNames}}<br>\r\n                {{=product.desc}}\r\n            </p>\r\n        </div>\r\n    </div>\r\n</div>";
+
+},{}],27:[function(require,module,exports){
+module.exports = "<dl class=\"p_list\">\r\n    <dt>\r\n        <a href=\"#product/{{=id}}\">\r\n            <img src=\"{{=previewImagesJson && previewImagesJson.length > 0 ? previewImagesJson[0] : ''}}\">\r\n        </a>\r\n    </dt>\r\n    <dd>\r\n        <p class=\"p_title\"><a href=\"#product/{{=id}}\">{{=name}}</a></p>\r\n        <p class=\"p_price\">￥{{=price}}</p>\r\n    </dd>\r\n</dl>";
+
+},{}],28:[function(require,module,exports){
+module.exports = "<li class=\"gwc_item_sel\"><a href=\"javascript:;\" class=\"dx_sel\"></a></li>\r\n<li class=\"gwc_itme_bd\">\r\n    <div class=\"fl gwc_img\"><a href=\"#product/{{=productId}}\"><img src=\"{{=productPreviewImage}}\"></a></div>\r\n    <div class=\"fl gwc_rinfo\">\r\n        <div class=\"gwc_rinfo_top\">\r\n            <p class=\"p_title\"><a href=\"#product/{{=productId}}\">{{=productName}}</a></p>\r\n            <p class=\"p_price\">￥{{=price}}</p>\r\n        </div>\r\n        <div class=\"good_num clearfix\">\r\n            <a class=\"decrease\" href=\"javascript:;\">-</a>\r\n            <input type=\"text\" value=\"{{=count}}\">\r\n            <a class=\"increase\" href=\"javascript:;\">+</a>\r\n        </div>\r\n    </div>\r\n</li>";
+
+},{}],29:[function(require,module,exports){
+module.exports = "<div class=\"gwc_main clearfix\">\r\n</div>\r\n<div class=\"clear\"></div>\r\n<div class=\"gwc_zj\">\r\n    <ul>\r\n        <li class=\"fl\"><a href=\"#\" class=\"fl dx_sel_active\"></a><span class=\"fl\">&nbsp;全选</span></li>\r\n        <li class=\"fl\">\r\n            <p class=\"gwc_hj\">合计：￥<span>{{=checkPrice}}</span></p>\r\n            <p class=\"gwc_amount\">总额：￥<span>{{=amountPrice}}</span></p>\r\n        </li>\r\n        <li class=\"fr\"><a href=\"#\">下订单</a></li>\r\n    </ul>\r\n</div>";
+
+},{}],30:[function(require,module,exports){
+module.exports = "<div class=\"top2 clearfix\">\r\n    <!--<img src=\"images/top2_gwc.png\">-->\r\n    <h2 class=\"top2_titleimg\"><img src=\"images/btn_gwc.png\" width=\"65\" height=\"65\"></h2>\r\n</div>\r\n<h1 class=\"top_title\">购物车</h1>\r\n<div class=\"w shopping-cart-main-container\">\r\n    {{\r\n        if (typeof id === 'undefined' || !items || items.length <= 0) {\r\n    }}\r\n    <div class=\"clear\"></div>\r\n    <div class=\"blank20\"></div>\r\n    <p class=\"noCar\"></p>\r\n    <p class=\"noCar_info\">您的购物车内还没有任何商品</p>\r\n    {{\r\n        }\r\n    }}\r\n</div>";
+
+},{}],31:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -631,7 +815,7 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../collections/ad-board":8,"../settings.json":14,"../templates/ad-board.tpl":15,"underscore":34}],23:[function(require,module,exports){
+},{"../base/view":7,"../collections/ad-board":8,"../settings.json":18,"../templates/ad-board.tpl":19,"underscore":50}],32:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -656,7 +840,7 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../templates/categoriy-lev1.tpl":16,"underscore":34}],24:[function(require,module,exports){
+},{"../base/view":7,"../templates/categoriy-lev1.tpl":20,"underscore":50}],33:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -681,7 +865,7 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../templates/footer-navbar.tpl":17,"underscore":34}],25:[function(require,module,exports){
+},{"../base/view":7,"../templates/footer-navbar.tpl":21,"underscore":50}],34:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -709,7 +893,7 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../templates/header.tpl":18,"underscore":34}],26:[function(require,module,exports){
+},{"../base/view":7,"../templates/header.tpl":22,"underscore":50}],35:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -740,7 +924,79 @@ module.exports = Page.extend({
     return this;
   }
 });
-},{"../base/page":4,"./ad-board":22,"./first-level-cat":23,"./footer-navbar":24,"./header":25,"./product-list-index":30}],27:[function(require,module,exports){
+},{"../base/page":4,"./ad-board":31,"./first-level-cat":32,"./footer-navbar":33,"./header":34,"./product-list-index":42}],36:[function(require,module,exports){
+/**
+ * @Description:
+ * @Author: fuwensong
+ * @Date: 2015/5/9
+ * @Company: China EKai
+ * @Copyright: All rights Reserved, Designed By EKai
+ *               Copyright(C) 2005-2014
+ */
+var _ = require('underscore');
+var Page = require('../base/page');
+var template = require('../templates/personal-center.tpl');
+var FooterNavbarView = require('./footer-navbar');
+var Settings = require('../settings.json');
+var UserModel = require('../models/user');
+
+module.exports = Page.extend({
+  id: 'personal-center-page',
+  template: _.template(template),
+  initialize: function () {
+    var model = new UserModel({id: Settings.userId});
+    model.fetch();
+
+    this.listenToOnce(model, 'change', this.render);
+  },
+  render: function (model) {
+    if (model) {
+      localStorage.setItem(Settings.locals.userInfo, JSON.stringify(model.toJSON()));
+    }
+
+    this.$el.empty();
+    this.$el.html(this.template(model.attributes));
+    this.$el.append(new FooterNavbarView().render().el);
+    return this;
+  }
+});
+},{"../base/page":4,"../models/user":16,"../settings.json":18,"../templates/personal-center.tpl":23,"./footer-navbar":33,"underscore":50}],37:[function(require,module,exports){
+/**
+ * @Description:
+ * @Author: fuwensong
+ * @Date: 2015/5/9
+ * @Company: China EKai
+ * @Copyright: All rights Reserved, Designed By EKai
+ *               Copyright(C) 2005-2014
+ */
+var _ = require('underscore');
+var Page = require('../base/page');
+var template = require('../templates/personal-info.tpl');
+var FooterNavbarView = require('./footer-navbar');
+var Settings = require('../settings.json');
+var UserModel = require('../models/user');
+
+module.exports = Page.extend({
+  id: 'personal-info-page',
+  template: _.template(template),
+  initialize: function () {
+    var model = new UserModel({id: Settings.userId});
+    model.fetch({url: model.personalInfoUrl()});
+
+    this.listenToOnce(model, 'change', this.render);
+  },
+  render: function (model) {
+    if (model) {
+      localStorage.setItem(Settings.locals.userInfo, JSON.stringify(model.toJSON()));
+    }
+
+    this.$el.empty();
+    this.$el.html(this.template(model.attributes));
+    this.$el.append(new FooterNavbarView().render().el);
+    return this;
+  }
+});
+},{"../base/page":4,"../models/user":16,"../settings.json":18,"../templates/personal-info.tpl":24,"./footer-navbar":33,"underscore":50}],38:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -821,7 +1077,73 @@ module.exports = Page.extend({
 
   }
 });
-},{"../base/page":4,"../templates/product-detail.tpl":20,"./footer-navbar":24,"./product-detail-spec":28,"jquery":33,"underscore":34}],28:[function(require,module,exports){
+},{"../base/page":4,"../templates/product-detail.tpl":26,"./footer-navbar":33,"./product-detail-spec":40,"jquery":49,"underscore":50}],39:[function(require,module,exports){
+/**
+ * @Description:
+ * @Author: fuwensong
+ * @Date: 2015/5/9
+ * @Company: China EKai
+ * @Copyright: All rights Reserved, Designed By EKai
+ *               Copyright(C) 2005-2014
+ */
+var _ = require('underscore');
+var Page = require('../base/page');
+var template = require('../templates/shopping-cart.tpl');
+var FooterNavbarView = require('./footer-navbar');
+var Settings = require('../settings.json');
+var ShoppingCartModel = require('../models/shopping-cart');
+var ShoppingCartListView = require('../views/shopping-cart-list');
+
+module.exports = Page.extend({
+  id: 'shopping-cart-page',
+  template: _.template(template),
+  initialize: function () {
+    var self = this;
+    var model = new ShoppingCartModel({userId: Settings.userId});
+
+    localStorage.removeItem(Settings.locals.userShoppingCart);
+    model.url = model.userRelationUrl();
+    model.fetch({
+      success: function (model, res) {
+        if (!res || !_.isObject(res) || !res.id) {
+          self.render(model);
+        }
+      },
+      error: function (model, res) {
+        if (res.status !== 500) {
+          self.render(model);
+        } else {
+          // TODO SHOW error message
+        }
+      }
+    });
+
+    this.listenToOnce(model, 'change', this.render);
+    this.model = model;
+  },
+  render: function (model) {
+    if (!model) {
+      var storedModel = localStorage.getItem(Settings.locals.userShoppingCart);
+      storedModel = JSON.parse(storedModel) || {};
+      this.model.set(storedModel);
+    }
+
+    model = model || this.model;
+    if (model && model.id) {
+      localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(model.toJSON()));
+    }
+
+    this.$el.empty();
+    this.$el.html(this.template(model.attributes));
+    var items = model.get('items');
+    if (items && items.length > 0) {
+      this.$el.find('.shopping-cart-main-container').append(new ShoppingCartListView({model: model}).render().el);
+    }
+    this.$el.append(new FooterNavbarView().render().el);
+    return this;
+  }
+});
+},{"../base/page":4,"../models/shopping-cart":15,"../settings.json":18,"../templates/shopping-cart.tpl":30,"../views/shopping-cart-list":44,"./footer-navbar":33,"underscore":50}],40:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -834,6 +1156,10 @@ var $ = require('jquery');
 var _ = require('underscore');
 var View = require('../base/view');
 var template = require('../templates/product-detail-spec.tpl');
+var ShoppingCartModel = require('../models/shopping-cart');
+var ShoppingCartItemModel = require('../models/shopping-cart-item');
+var Settings = require('../settings.json');
+var async = require('async');
 
 module.exports = View.extend({
   name: 'ProductDetailSpec',
@@ -842,7 +1168,8 @@ module.exports = View.extend({
   events: {
     'click .good_ggchioce>li': 'switchSpecEvent',
     'click .good_num .decrease': 'decreaseNumEvent',
-    'click .good_num .increase': 'increaseNumEvent'
+    'click .good_num .increase': 'increaseNumEvent',
+    'click .good_btn_go': 'addIntoShoppingCartEvent'
   },
   initialize: function () {
     this.listenTo(this.model.get('chooseSpecModel'), 'change', this.render);
@@ -889,9 +1216,145 @@ module.exports = View.extend({
   },
   increaseNumEvent: function (e) {
     this.setPurchaseNum(e, true);
+  },
+  addIntoShoppingCartEvent: function (e) {
+    var chooseSpecIndex = this.model.get('chooseSpecIndex');
+    var chooseSpecModel = this.model.get('chooseSpecModel');
+    var selected = chooseSpecIndex >= 0 && chooseSpecModel.id && !_.isEmpty(chooseSpecModel.attributes);
+
+    if (!selected) {
+      // TODO show waring
+      console.warn('Not selected!!!')
+    } else {
+      var count = parseInt(this.$el.find('.good_num>input').val());
+      if (!chooseSpecModel.purchasable(count)) {
+        return console.error('Count is invalid!');
+      }
+
+      var shoppingCartItemModel = new ShoppingCartItemModel({
+        productId: this.model.id,
+        productName: this.model.get('name'),
+        productPreviewImage: this.model.get('previewImagesJson')[0] || '',
+        specificationId: chooseSpecModel.id,
+        price: chooseSpecModel.get('price'),
+        referencePrice: chooseSpecModel.get('referencePrice'),
+        count: count
+      });
+
+      var storedShoppingCart = localStorage.getItem(Settings.locals.userShoppingCart);
+      if (storedShoppingCart) {
+        storedShoppingCart = JSON.parse(storedShoppingCart);
+
+        var productId = shoppingCartItemModel.get('productId');
+        var specificationId = shoppingCartItemModel.get('specificationId');
+        var items = storedShoppingCart.items;
+        var existedItem = _.findWhere(items, {productId: productId, specificationId: specificationId});
+
+        if (existedItem) {
+          existedItem.count += shoppingCartItemModel.get('count');
+          shoppingCartItemModel.set(existedItem);
+        } else {
+          shoppingCartItemModel.set('shoppingCartId', storedShoppingCart.id);
+        }
+
+        shoppingCartItemModel.save(shoppingCartItemModel.attributes, {
+          success: function (model) {
+            if (!existedItem) {
+              storedShoppingCart.items.push(model.attributes);
+            }
+            alert('添加成功!');
+            console.log('Added into shopping cart success!', model);
+            localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(storedShoppingCart));
+          },
+          error: function (model, err) {
+            console.error('Error: ' + err);
+            alert('添加失败!');
+          }
+        });
+
+      } else {
+
+        async.waterfall([
+          function checkShoppingCart(callback){
+            var shoppingCartModel = new ShoppingCartModel({userId: Settings.userId});
+
+            shoppingCartModel.url = shoppingCartModel.checkUrl();
+            shoppingCartModel.fetch({
+              success: function (model) {
+                callback(null, model);
+              },
+              error: function (model, err) {
+                if (err.status === 500) {
+                  return callback(err, model);
+                }
+
+                // not create shopping cart before
+                model.url = model.urlRoot();
+                model.save(model.attributes, {
+                  success: function (model) {
+                    callback(null, model);
+                  },
+                  error: function (model, err) {
+                    callback(err);
+                  }
+                });
+
+              }
+            });
+          },
+          function loadItems(shoppingCart, callback) {
+            shoppingCart.url = shoppingCart.userRelationUrl();
+            shoppingCart.fetch({
+              success: function (model) {
+                callback(null, model);
+              },
+              error: function (model, err) {
+                callback(err);
+              }
+            });
+          },
+          function saveItem(shoppingCart, callback) {
+            var productId = shoppingCartItemModel.get('productId');
+            var specificationId = shoppingCartItemModel.get('specificationId');
+            var items = shoppingCart.get('items');
+            var existedItem = _.findWhere(items, {productId: productId, specificationId: specificationId});
+
+            if (existedItem) {
+              existedItem.count += shoppingCartItemModel.get('count');
+              shoppingCartItemModel.set(existedItem);
+            } else {
+              shoppingCartItemModel.set('shoppingCartId', shoppingCart.id);
+            }
+
+            shoppingCartItemModel.save(shoppingCartItemModel.attributes, {
+              patch: true,
+              success: function (model) {
+                callback(null, model, shoppingCart, !existedItem);
+              },
+              error: function (model, err) {
+                callback(err);
+              }
+            });
+          }
+        ], function (err, model, shoppingCart, append) {
+          if (err) {
+            alert('添加失败!');
+            return console.error('Error: ' + err);
+          }
+          console.log('Added into shopping cart success!', model);
+
+          if (append) {
+            shoppingCart.get('items').push(model.attributes);
+          }
+          localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(shoppingCart.toJSON()));
+          alert('添加成功!');
+        });
+
+      }
+    }
   }
 });
-},{"../base/view":7,"../templates/product-detail-spec.tpl":19,"jquery":33,"underscore":34}],29:[function(require,module,exports){
+},{"../base/view":7,"../models/shopping-cart":15,"../models/shopping-cart-item":14,"../settings.json":18,"../templates/product-detail-spec.tpl":25,"async":45,"jquery":49,"underscore":50}],41:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -918,7 +1381,7 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../templates/product-item.tpl":21,"underscore":34}],30:[function(require,module,exports){
+},{"../base/view":7,"../templates/product-item.tpl":27,"underscore":50}],42:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -955,7 +1418,1247 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../collections/product":9,"../settings.json":14,"./product-item":29,"underscore":34}],31:[function(require,module,exports){
+},{"../base/view":7,"../collections/product":9,"../settings.json":18,"./product-item":41,"underscore":50}],43:[function(require,module,exports){
+/**
+ * @Description:
+ * @Author: fuwensong
+ * @Date: 2015/5/9
+ * @Company: China EKai
+ * @Copyright: All rights Reserved, Designed By EKai
+ *               Copyright(C) 2005-2014
+ */
+var $ = require('jquery');
+var _ = require('underscore');
+var View = require('../base/view');
+var template = require('../templates/shopping-cart-item.tpl');
+
+module.exports = View.extend({
+  role: 'list-item',
+  tagName: 'ul',
+  className: 'gwc_list',
+  template: _.template(template),
+  events: {
+    'click .good_num .increase': 'increaseNumEvent',
+    'click .good_num .decrease': 'decreaseNumEvent'
+  },
+  initialize: function () {
+  },
+  render: function () {
+    this.$el.empty();
+    this.$el.html(this.template(this.model.attributes));
+    return this;
+  },
+  increaseNumEvent: function(e) {
+    this.setPurchaseNum(e, true);
+  },
+  decreaseNumEvent: function(e) {
+    this.setPurchaseNum(e, false);
+  },
+  setPurchaseNum: function (e, plus) {
+    var model = this.model;
+    var chooseSpecModel = model.get('chooseSpecModel');
+    var el = $(e.currentTarget);
+    var inputEl = el.siblings('input');
+    var count = parseInt(inputEl.val());
+    count = plus ? count + 1 : count - 1;
+
+    if (count > 0 && count !== model.get('count')) {
+      model.save({count: count}, {
+        success: function (model) {
+          inputEl.val(model.get('count'));
+        }
+      });
+    }
+  }
+});
+},{"../base/view":7,"../templates/shopping-cart-item.tpl":28,"jquery":49,"underscore":50}],44:[function(require,module,exports){
+/**
+ * @Description:
+ * @Author: fuwensong
+ * @Date: 2015/5/9
+ */
+var _ = require('underscore');
+var Settings = require('../settings.json');
+var View = require('../base/view');
+var ShoppingCartItemCollection = require('../collections/shopping-cart-item');
+var ShoppingCartItemView = require('./shopping-cart-item');
+var template = require('../templates/shopping-cart-items.tpl');
+
+module.exports = View.extend({
+  name: 'ShoppingCartItemList',
+  className: 'shopping-cart-item-list',
+  template: _.template(template),
+  initialize: function () {
+    this.collection = new ShoppingCartItemCollection(this.model.get('items'));
+
+    this.listenTo(this.model, 'change:checkPrice', this.renderCheckPrice);
+    this.listenTo(this.model, 'change:amountPrice', this.renderAmountPrice);
+  },
+  render: function () {
+    var self = this;
+    this.model.resetAmountPrice();
+
+    this.$el.empty();
+    this.$el.html(this.template(this.model.attributes));
+
+    var collection = this.collection;
+    var mainEl = this.$el.find('.gwc_main');
+    if (collection && collection.length > 0) {
+
+      _.each(collection.models, function (model) {
+        self.listenTo(model, 'change:count', self.resetCountHandler);
+        mainEl.append(new ShoppingCartItemView({model: model}).render().el);
+      });
+
+    }
+    return this;
+  },
+  renderCheckPrice: function (model, value) {
+    this.$el.find('.gwc_hj span').text(value);
+  },
+  renderAmountPrice: function (model, value) {
+    this.$el.find('.gwc_amount span').text(value);
+  },
+  resetCountHandler: function (model, count) {
+    var items = this.model.get('items');
+    var existedItem = _.findWhere(items, {id: model.id});
+    if (existedItem) {
+      existedItem.count = count;
+    }
+    this.model.set('items', items);
+
+    this.model.resetAmountPrice();
+    localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(this.model.toJSON()));
+  }
+});
+},{"../base/view":7,"../collections/shopping-cart-item":10,"../settings.json":18,"../templates/shopping-cart-items.tpl":29,"./shopping-cart-item":43,"underscore":50}],45:[function(require,module,exports){
+(function (process){
+/*!
+ * async
+ * https://github.com/caolan/async
+ *
+ * Copyright 2010-2014 Caolan McMahon
+ * Released under the MIT license
+ */
+/*jshint onevar: false, indent:4 */
+/*global setImmediate: false, setTimeout: false, console: false */
+(function () {
+
+    var async = {};
+
+    // global on the server, window in the browser
+    var root, previous_async;
+
+    root = this;
+    if (root != null) {
+      previous_async = root.async;
+    }
+
+    async.noConflict = function () {
+        root.async = previous_async;
+        return async;
+    };
+
+    function only_once(fn) {
+        var called = false;
+        return function() {
+            if (called) throw new Error("Callback was already called.");
+            called = true;
+            fn.apply(root, arguments);
+        }
+    }
+
+    //// cross-browser compatiblity functions ////
+
+    var _toString = Object.prototype.toString;
+
+    var _isArray = Array.isArray || function (obj) {
+        return _toString.call(obj) === '[object Array]';
+    };
+
+    var _each = function (arr, iterator) {
+        if (arr.forEach) {
+            return arr.forEach(iterator);
+        }
+        for (var i = 0; i < arr.length; i += 1) {
+            iterator(arr[i], i, arr);
+        }
+    };
+
+    var _map = function (arr, iterator) {
+        if (arr.map) {
+            return arr.map(iterator);
+        }
+        var results = [];
+        _each(arr, function (x, i, a) {
+            results.push(iterator(x, i, a));
+        });
+        return results;
+    };
+
+    var _reduce = function (arr, iterator, memo) {
+        if (arr.reduce) {
+            return arr.reduce(iterator, memo);
+        }
+        _each(arr, function (x, i, a) {
+            memo = iterator(memo, x, i, a);
+        });
+        return memo;
+    };
+
+    var _keys = function (obj) {
+        if (Object.keys) {
+            return Object.keys(obj);
+        }
+        var keys = [];
+        for (var k in obj) {
+            if (obj.hasOwnProperty(k)) {
+                keys.push(k);
+            }
+        }
+        return keys;
+    };
+
+    //// exported async module functions ////
+
+    //// nextTick implementation with browser-compatible fallback ////
+    if (typeof process === 'undefined' || !(process.nextTick)) {
+        if (typeof setImmediate === 'function') {
+            async.nextTick = function (fn) {
+                // not a direct alias for IE10 compatibility
+                setImmediate(fn);
+            };
+            async.setImmediate = async.nextTick;
+        }
+        else {
+            async.nextTick = function (fn) {
+                setTimeout(fn, 0);
+            };
+            async.setImmediate = async.nextTick;
+        }
+    }
+    else {
+        async.nextTick = process.nextTick;
+        if (typeof setImmediate !== 'undefined') {
+            async.setImmediate = function (fn) {
+              // not a direct alias for IE10 compatibility
+              setImmediate(fn);
+            };
+        }
+        else {
+            async.setImmediate = async.nextTick;
+        }
+    }
+
+    async.each = function (arr, iterator, callback) {
+        callback = callback || function () {};
+        if (!arr.length) {
+            return callback();
+        }
+        var completed = 0;
+        _each(arr, function (x) {
+            iterator(x, only_once(done) );
+        });
+        function done(err) {
+          if (err) {
+              callback(err);
+              callback = function () {};
+          }
+          else {
+              completed += 1;
+              if (completed >= arr.length) {
+                  callback();
+              }
+          }
+        }
+    };
+    async.forEach = async.each;
+
+    async.eachSeries = function (arr, iterator, callback) {
+        callback = callback || function () {};
+        if (!arr.length) {
+            return callback();
+        }
+        var completed = 0;
+        var iterate = function () {
+            iterator(arr[completed], function (err) {
+                if (err) {
+                    callback(err);
+                    callback = function () {};
+                }
+                else {
+                    completed += 1;
+                    if (completed >= arr.length) {
+                        callback();
+                    }
+                    else {
+                        iterate();
+                    }
+                }
+            });
+        };
+        iterate();
+    };
+    async.forEachSeries = async.eachSeries;
+
+    async.eachLimit = function (arr, limit, iterator, callback) {
+        var fn = _eachLimit(limit);
+        fn.apply(null, [arr, iterator, callback]);
+    };
+    async.forEachLimit = async.eachLimit;
+
+    var _eachLimit = function (limit) {
+
+        return function (arr, iterator, callback) {
+            callback = callback || function () {};
+            if (!arr.length || limit <= 0) {
+                return callback();
+            }
+            var completed = 0;
+            var started = 0;
+            var running = 0;
+
+            (function replenish () {
+                if (completed >= arr.length) {
+                    return callback();
+                }
+
+                while (running < limit && started < arr.length) {
+                    started += 1;
+                    running += 1;
+                    iterator(arr[started - 1], function (err) {
+                        if (err) {
+                            callback(err);
+                            callback = function () {};
+                        }
+                        else {
+                            completed += 1;
+                            running -= 1;
+                            if (completed >= arr.length) {
+                                callback();
+                            }
+                            else {
+                                replenish();
+                            }
+                        }
+                    });
+                }
+            })();
+        };
+    };
+
+
+    var doParallel = function (fn) {
+        return function () {
+            var args = Array.prototype.slice.call(arguments);
+            return fn.apply(null, [async.each].concat(args));
+        };
+    };
+    var doParallelLimit = function(limit, fn) {
+        return function () {
+            var args = Array.prototype.slice.call(arguments);
+            return fn.apply(null, [_eachLimit(limit)].concat(args));
+        };
+    };
+    var doSeries = function (fn) {
+        return function () {
+            var args = Array.prototype.slice.call(arguments);
+            return fn.apply(null, [async.eachSeries].concat(args));
+        };
+    };
+
+
+    var _asyncMap = function (eachfn, arr, iterator, callback) {
+        arr = _map(arr, function (x, i) {
+            return {index: i, value: x};
+        });
+        if (!callback) {
+            eachfn(arr, function (x, callback) {
+                iterator(x.value, function (err) {
+                    callback(err);
+                });
+            });
+        } else {
+            var results = [];
+            eachfn(arr, function (x, callback) {
+                iterator(x.value, function (err, v) {
+                    results[x.index] = v;
+                    callback(err);
+                });
+            }, function (err) {
+                callback(err, results);
+            });
+        }
+    };
+    async.map = doParallel(_asyncMap);
+    async.mapSeries = doSeries(_asyncMap);
+    async.mapLimit = function (arr, limit, iterator, callback) {
+        return _mapLimit(limit)(arr, iterator, callback);
+    };
+
+    var _mapLimit = function(limit) {
+        return doParallelLimit(limit, _asyncMap);
+    };
+
+    // reduce only has a series version, as doing reduce in parallel won't
+    // work in many situations.
+    async.reduce = function (arr, memo, iterator, callback) {
+        async.eachSeries(arr, function (x, callback) {
+            iterator(memo, x, function (err, v) {
+                memo = v;
+                callback(err);
+            });
+        }, function (err) {
+            callback(err, memo);
+        });
+    };
+    // inject alias
+    async.inject = async.reduce;
+    // foldl alias
+    async.foldl = async.reduce;
+
+    async.reduceRight = function (arr, memo, iterator, callback) {
+        var reversed = _map(arr, function (x) {
+            return x;
+        }).reverse();
+        async.reduce(reversed, memo, iterator, callback);
+    };
+    // foldr alias
+    async.foldr = async.reduceRight;
+
+    var _filter = function (eachfn, arr, iterator, callback) {
+        var results = [];
+        arr = _map(arr, function (x, i) {
+            return {index: i, value: x};
+        });
+        eachfn(arr, function (x, callback) {
+            iterator(x.value, function (v) {
+                if (v) {
+                    results.push(x);
+                }
+                callback();
+            });
+        }, function (err) {
+            callback(_map(results.sort(function (a, b) {
+                return a.index - b.index;
+            }), function (x) {
+                return x.value;
+            }));
+        });
+    };
+    async.filter = doParallel(_filter);
+    async.filterSeries = doSeries(_filter);
+    // select alias
+    async.select = async.filter;
+    async.selectSeries = async.filterSeries;
+
+    var _reject = function (eachfn, arr, iterator, callback) {
+        var results = [];
+        arr = _map(arr, function (x, i) {
+            return {index: i, value: x};
+        });
+        eachfn(arr, function (x, callback) {
+            iterator(x.value, function (v) {
+                if (!v) {
+                    results.push(x);
+                }
+                callback();
+            });
+        }, function (err) {
+            callback(_map(results.sort(function (a, b) {
+                return a.index - b.index;
+            }), function (x) {
+                return x.value;
+            }));
+        });
+    };
+    async.reject = doParallel(_reject);
+    async.rejectSeries = doSeries(_reject);
+
+    var _detect = function (eachfn, arr, iterator, main_callback) {
+        eachfn(arr, function (x, callback) {
+            iterator(x, function (result) {
+                if (result) {
+                    main_callback(x);
+                    main_callback = function () {};
+                }
+                else {
+                    callback();
+                }
+            });
+        }, function (err) {
+            main_callback();
+        });
+    };
+    async.detect = doParallel(_detect);
+    async.detectSeries = doSeries(_detect);
+
+    async.some = function (arr, iterator, main_callback) {
+        async.each(arr, function (x, callback) {
+            iterator(x, function (v) {
+                if (v) {
+                    main_callback(true);
+                    main_callback = function () {};
+                }
+                callback();
+            });
+        }, function (err) {
+            main_callback(false);
+        });
+    };
+    // any alias
+    async.any = async.some;
+
+    async.every = function (arr, iterator, main_callback) {
+        async.each(arr, function (x, callback) {
+            iterator(x, function (v) {
+                if (!v) {
+                    main_callback(false);
+                    main_callback = function () {};
+                }
+                callback();
+            });
+        }, function (err) {
+            main_callback(true);
+        });
+    };
+    // all alias
+    async.all = async.every;
+
+    async.sortBy = function (arr, iterator, callback) {
+        async.map(arr, function (x, callback) {
+            iterator(x, function (err, criteria) {
+                if (err) {
+                    callback(err);
+                }
+                else {
+                    callback(null, {value: x, criteria: criteria});
+                }
+            });
+        }, function (err, results) {
+            if (err) {
+                return callback(err);
+            }
+            else {
+                var fn = function (left, right) {
+                    var a = left.criteria, b = right.criteria;
+                    return a < b ? -1 : a > b ? 1 : 0;
+                };
+                callback(null, _map(results.sort(fn), function (x) {
+                    return x.value;
+                }));
+            }
+        });
+    };
+
+    async.auto = function (tasks, callback) {
+        callback = callback || function () {};
+        var keys = _keys(tasks);
+        var remainingTasks = keys.length
+        if (!remainingTasks) {
+            return callback();
+        }
+
+        var results = {};
+
+        var listeners = [];
+        var addListener = function (fn) {
+            listeners.unshift(fn);
+        };
+        var removeListener = function (fn) {
+            for (var i = 0; i < listeners.length; i += 1) {
+                if (listeners[i] === fn) {
+                    listeners.splice(i, 1);
+                    return;
+                }
+            }
+        };
+        var taskComplete = function () {
+            remainingTasks--
+            _each(listeners.slice(0), function (fn) {
+                fn();
+            });
+        };
+
+        addListener(function () {
+            if (!remainingTasks) {
+                var theCallback = callback;
+                // prevent final callback from calling itself if it errors
+                callback = function () {};
+
+                theCallback(null, results);
+            }
+        });
+
+        _each(keys, function (k) {
+            var task = _isArray(tasks[k]) ? tasks[k]: [tasks[k]];
+            var taskCallback = function (err) {
+                var args = Array.prototype.slice.call(arguments, 1);
+                if (args.length <= 1) {
+                    args = args[0];
+                }
+                if (err) {
+                    var safeResults = {};
+                    _each(_keys(results), function(rkey) {
+                        safeResults[rkey] = results[rkey];
+                    });
+                    safeResults[k] = args;
+                    callback(err, safeResults);
+                    // stop subsequent errors hitting callback multiple times
+                    callback = function () {};
+                }
+                else {
+                    results[k] = args;
+                    async.setImmediate(taskComplete);
+                }
+            };
+            var requires = task.slice(0, Math.abs(task.length - 1)) || [];
+            var ready = function () {
+                return _reduce(requires, function (a, x) {
+                    return (a && results.hasOwnProperty(x));
+                }, true) && !results.hasOwnProperty(k);
+            };
+            if (ready()) {
+                task[task.length - 1](taskCallback, results);
+            }
+            else {
+                var listener = function () {
+                    if (ready()) {
+                        removeListener(listener);
+                        task[task.length - 1](taskCallback, results);
+                    }
+                };
+                addListener(listener);
+            }
+        });
+    };
+
+    async.retry = function(times, task, callback) {
+        var DEFAULT_TIMES = 5;
+        var attempts = [];
+        // Use defaults if times not passed
+        if (typeof times === 'function') {
+            callback = task;
+            task = times;
+            times = DEFAULT_TIMES;
+        }
+        // Make sure times is a number
+        times = parseInt(times, 10) || DEFAULT_TIMES;
+        var wrappedTask = function(wrappedCallback, wrappedResults) {
+            var retryAttempt = function(task, finalAttempt) {
+                return function(seriesCallback) {
+                    task(function(err, result){
+                        seriesCallback(!err || finalAttempt, {err: err, result: result});
+                    }, wrappedResults);
+                };
+            };
+            while (times) {
+                attempts.push(retryAttempt(task, !(times-=1)));
+            }
+            async.series(attempts, function(done, data){
+                data = data[data.length - 1];
+                (wrappedCallback || callback)(data.err, data.result);
+            });
+        }
+        // If a callback is passed, run this as a controll flow
+        return callback ? wrappedTask() : wrappedTask
+    };
+
+    async.waterfall = function (tasks, callback) {
+        callback = callback || function () {};
+        if (!_isArray(tasks)) {
+          var err = new Error('First argument to waterfall must be an array of functions');
+          return callback(err);
+        }
+        if (!tasks.length) {
+            return callback();
+        }
+        var wrapIterator = function (iterator) {
+            return function (err) {
+                if (err) {
+                    callback.apply(null, arguments);
+                    callback = function () {};
+                }
+                else {
+                    var args = Array.prototype.slice.call(arguments, 1);
+                    var next = iterator.next();
+                    if (next) {
+                        args.push(wrapIterator(next));
+                    }
+                    else {
+                        args.push(callback);
+                    }
+                    async.setImmediate(function () {
+                        iterator.apply(null, args);
+                    });
+                }
+            };
+        };
+        wrapIterator(async.iterator(tasks))();
+    };
+
+    var _parallel = function(eachfn, tasks, callback) {
+        callback = callback || function () {};
+        if (_isArray(tasks)) {
+            eachfn.map(tasks, function (fn, callback) {
+                if (fn) {
+                    fn(function (err) {
+                        var args = Array.prototype.slice.call(arguments, 1);
+                        if (args.length <= 1) {
+                            args = args[0];
+                        }
+                        callback.call(null, err, args);
+                    });
+                }
+            }, callback);
+        }
+        else {
+            var results = {};
+            eachfn.each(_keys(tasks), function (k, callback) {
+                tasks[k](function (err) {
+                    var args = Array.prototype.slice.call(arguments, 1);
+                    if (args.length <= 1) {
+                        args = args[0];
+                    }
+                    results[k] = args;
+                    callback(err);
+                });
+            }, function (err) {
+                callback(err, results);
+            });
+        }
+    };
+
+    async.parallel = function (tasks, callback) {
+        _parallel({ map: async.map, each: async.each }, tasks, callback);
+    };
+
+    async.parallelLimit = function(tasks, limit, callback) {
+        _parallel({ map: _mapLimit(limit), each: _eachLimit(limit) }, tasks, callback);
+    };
+
+    async.series = function (tasks, callback) {
+        callback = callback || function () {};
+        if (_isArray(tasks)) {
+            async.mapSeries(tasks, function (fn, callback) {
+                if (fn) {
+                    fn(function (err) {
+                        var args = Array.prototype.slice.call(arguments, 1);
+                        if (args.length <= 1) {
+                            args = args[0];
+                        }
+                        callback.call(null, err, args);
+                    });
+                }
+            }, callback);
+        }
+        else {
+            var results = {};
+            async.eachSeries(_keys(tasks), function (k, callback) {
+                tasks[k](function (err) {
+                    var args = Array.prototype.slice.call(arguments, 1);
+                    if (args.length <= 1) {
+                        args = args[0];
+                    }
+                    results[k] = args;
+                    callback(err);
+                });
+            }, function (err) {
+                callback(err, results);
+            });
+        }
+    };
+
+    async.iterator = function (tasks) {
+        var makeCallback = function (index) {
+            var fn = function () {
+                if (tasks.length) {
+                    tasks[index].apply(null, arguments);
+                }
+                return fn.next();
+            };
+            fn.next = function () {
+                return (index < tasks.length - 1) ? makeCallback(index + 1): null;
+            };
+            return fn;
+        };
+        return makeCallback(0);
+    };
+
+    async.apply = function (fn) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return function () {
+            return fn.apply(
+                null, args.concat(Array.prototype.slice.call(arguments))
+            );
+        };
+    };
+
+    var _concat = function (eachfn, arr, fn, callback) {
+        var r = [];
+        eachfn(arr, function (x, cb) {
+            fn(x, function (err, y) {
+                r = r.concat(y || []);
+                cb(err);
+            });
+        }, function (err) {
+            callback(err, r);
+        });
+    };
+    async.concat = doParallel(_concat);
+    async.concatSeries = doSeries(_concat);
+
+    async.whilst = function (test, iterator, callback) {
+        if (test()) {
+            iterator(function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                async.whilst(test, iterator, callback);
+            });
+        }
+        else {
+            callback();
+        }
+    };
+
+    async.doWhilst = function (iterator, test, callback) {
+        iterator(function (err) {
+            if (err) {
+                return callback(err);
+            }
+            var args = Array.prototype.slice.call(arguments, 1);
+            if (test.apply(null, args)) {
+                async.doWhilst(iterator, test, callback);
+            }
+            else {
+                callback();
+            }
+        });
+    };
+
+    async.until = function (test, iterator, callback) {
+        if (!test()) {
+            iterator(function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                async.until(test, iterator, callback);
+            });
+        }
+        else {
+            callback();
+        }
+    };
+
+    async.doUntil = function (iterator, test, callback) {
+        iterator(function (err) {
+            if (err) {
+                return callback(err);
+            }
+            var args = Array.prototype.slice.call(arguments, 1);
+            if (!test.apply(null, args)) {
+                async.doUntil(iterator, test, callback);
+            }
+            else {
+                callback();
+            }
+        });
+    };
+
+    async.queue = function (worker, concurrency) {
+        if (concurrency === undefined) {
+            concurrency = 1;
+        }
+        function _insert(q, data, pos, callback) {
+          if (!q.started){
+            q.started = true;
+          }
+          if (!_isArray(data)) {
+              data = [data];
+          }
+          if(data.length == 0) {
+             // call drain immediately if there are no tasks
+             return async.setImmediate(function() {
+                 if (q.drain) {
+                     q.drain();
+                 }
+             });
+          }
+          _each(data, function(task) {
+              var item = {
+                  data: task,
+                  callback: typeof callback === 'function' ? callback : null
+              };
+
+              if (pos) {
+                q.tasks.unshift(item);
+              } else {
+                q.tasks.push(item);
+              }
+
+              if (q.saturated && q.tasks.length === q.concurrency) {
+                  q.saturated();
+              }
+              async.setImmediate(q.process);
+          });
+        }
+
+        var workers = 0;
+        var q = {
+            tasks: [],
+            concurrency: concurrency,
+            saturated: null,
+            empty: null,
+            drain: null,
+            started: false,
+            paused: false,
+            push: function (data, callback) {
+              _insert(q, data, false, callback);
+            },
+            kill: function () {
+              q.drain = null;
+              q.tasks = [];
+            },
+            unshift: function (data, callback) {
+              _insert(q, data, true, callback);
+            },
+            process: function () {
+                if (!q.paused && workers < q.concurrency && q.tasks.length) {
+                    var task = q.tasks.shift();
+                    if (q.empty && q.tasks.length === 0) {
+                        q.empty();
+                    }
+                    workers += 1;
+                    var next = function () {
+                        workers -= 1;
+                        if (task.callback) {
+                            task.callback.apply(task, arguments);
+                        }
+                        if (q.drain && q.tasks.length + workers === 0) {
+                            q.drain();
+                        }
+                        q.process();
+                    };
+                    var cb = only_once(next);
+                    worker(task.data, cb);
+                }
+            },
+            length: function () {
+                return q.tasks.length;
+            },
+            running: function () {
+                return workers;
+            },
+            idle: function() {
+                return q.tasks.length + workers === 0;
+            },
+            pause: function () {
+                if (q.paused === true) { return; }
+                q.paused = true;
+                q.process();
+            },
+            resume: function () {
+                if (q.paused === false) { return; }
+                q.paused = false;
+                q.process();
+            }
+        };
+        return q;
+    };
+    
+    async.priorityQueue = function (worker, concurrency) {
+        
+        function _compareTasks(a, b){
+          return a.priority - b.priority;
+        };
+        
+        function _binarySearch(sequence, item, compare) {
+          var beg = -1,
+              end = sequence.length - 1;
+          while (beg < end) {
+            var mid = beg + ((end - beg + 1) >>> 1);
+            if (compare(item, sequence[mid]) >= 0) {
+              beg = mid;
+            } else {
+              end = mid - 1;
+            }
+          }
+          return beg;
+        }
+        
+        function _insert(q, data, priority, callback) {
+          if (!q.started){
+            q.started = true;
+          }
+          if (!_isArray(data)) {
+              data = [data];
+          }
+          if(data.length == 0) {
+             // call drain immediately if there are no tasks
+             return async.setImmediate(function() {
+                 if (q.drain) {
+                     q.drain();
+                 }
+             });
+          }
+          _each(data, function(task) {
+              var item = {
+                  data: task,
+                  priority: priority,
+                  callback: typeof callback === 'function' ? callback : null
+              };
+              
+              q.tasks.splice(_binarySearch(q.tasks, item, _compareTasks) + 1, 0, item);
+
+              if (q.saturated && q.tasks.length === q.concurrency) {
+                  q.saturated();
+              }
+              async.setImmediate(q.process);
+          });
+        }
+        
+        // Start with a normal queue
+        var q = async.queue(worker, concurrency);
+        
+        // Override push to accept second parameter representing priority
+        q.push = function (data, priority, callback) {
+          _insert(q, data, priority, callback);
+        };
+        
+        // Remove unshift function
+        delete q.unshift;
+
+        return q;
+    };
+
+    async.cargo = function (worker, payload) {
+        var working     = false,
+            tasks       = [];
+
+        var cargo = {
+            tasks: tasks,
+            payload: payload,
+            saturated: null,
+            empty: null,
+            drain: null,
+            drained: true,
+            push: function (data, callback) {
+                if (!_isArray(data)) {
+                    data = [data];
+                }
+                _each(data, function(task) {
+                    tasks.push({
+                        data: task,
+                        callback: typeof callback === 'function' ? callback : null
+                    });
+                    cargo.drained = false;
+                    if (cargo.saturated && tasks.length === payload) {
+                        cargo.saturated();
+                    }
+                });
+                async.setImmediate(cargo.process);
+            },
+            process: function process() {
+                if (working) return;
+                if (tasks.length === 0) {
+                    if(cargo.drain && !cargo.drained) cargo.drain();
+                    cargo.drained = true;
+                    return;
+                }
+
+                var ts = typeof payload === 'number'
+                            ? tasks.splice(0, payload)
+                            : tasks.splice(0, tasks.length);
+
+                var ds = _map(ts, function (task) {
+                    return task.data;
+                });
+
+                if(cargo.empty) cargo.empty();
+                working = true;
+                worker(ds, function () {
+                    working = false;
+
+                    var args = arguments;
+                    _each(ts, function (data) {
+                        if (data.callback) {
+                            data.callback.apply(null, args);
+                        }
+                    });
+
+                    process();
+                });
+            },
+            length: function () {
+                return tasks.length;
+            },
+            running: function () {
+                return working;
+            }
+        };
+        return cargo;
+    };
+
+    var _console_fn = function (name) {
+        return function (fn) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            fn.apply(null, args.concat([function (err) {
+                var args = Array.prototype.slice.call(arguments, 1);
+                if (typeof console !== 'undefined') {
+                    if (err) {
+                        if (console.error) {
+                            console.error(err);
+                        }
+                    }
+                    else if (console[name]) {
+                        _each(args, function (x) {
+                            console[name](x);
+                        });
+                    }
+                }
+            }]));
+        };
+    };
+    async.log = _console_fn('log');
+    async.dir = _console_fn('dir');
+    /*async.info = _console_fn('info');
+    async.warn = _console_fn('warn');
+    async.error = _console_fn('error');*/
+
+    async.memoize = function (fn, hasher) {
+        var memo = {};
+        var queues = {};
+        hasher = hasher || function (x) {
+            return x;
+        };
+        var memoized = function () {
+            var args = Array.prototype.slice.call(arguments);
+            var callback = args.pop();
+            var key = hasher.apply(null, args);
+            if (key in memo) {
+                async.nextTick(function () {
+                    callback.apply(null, memo[key]);
+                });
+            }
+            else if (key in queues) {
+                queues[key].push(callback);
+            }
+            else {
+                queues[key] = [callback];
+                fn.apply(null, args.concat([function () {
+                    memo[key] = arguments;
+                    var q = queues[key];
+                    delete queues[key];
+                    for (var i = 0, l = q.length; i < l; i++) {
+                      q[i].apply(null, arguments);
+                    }
+                }]));
+            }
+        };
+        memoized.memo = memo;
+        memoized.unmemoized = fn;
+        return memoized;
+    };
+
+    async.unmemoize = function (fn) {
+      return function () {
+        return (fn.unmemoized || fn).apply(null, arguments);
+      };
+    };
+
+    async.times = function (count, iterator, callback) {
+        var counter = [];
+        for (var i = 0; i < count; i++) {
+            counter.push(i);
+        }
+        return async.map(counter, iterator, callback);
+    };
+
+    async.timesSeries = function (count, iterator, callback) {
+        var counter = [];
+        for (var i = 0; i < count; i++) {
+            counter.push(i);
+        }
+        return async.mapSeries(counter, iterator, callback);
+    };
+
+    async.seq = function (/* functions... */) {
+        var fns = arguments;
+        return function () {
+            var that = this;
+            var args = Array.prototype.slice.call(arguments);
+            var callback = args.pop();
+            async.reduce(fns, args, function (newargs, fn, cb) {
+                fn.apply(that, newargs.concat([function () {
+                    var err = arguments[0];
+                    var nextargs = Array.prototype.slice.call(arguments, 1);
+                    cb(err, nextargs);
+                }]))
+            },
+            function (err, results) {
+                callback.apply(that, [err].concat(results));
+            });
+        };
+    };
+
+    async.compose = function (/* functions... */) {
+      return async.seq.apply(null, Array.prototype.reverse.call(arguments));
+    };
+
+    var _applyEach = function (eachfn, fns /*args...*/) {
+        var go = function () {
+            var that = this;
+            var args = Array.prototype.slice.call(arguments);
+            var callback = args.pop();
+            return eachfn(fns, function (fn, cb) {
+                fn.apply(that, args.concat([cb]));
+            },
+            callback);
+        };
+        if (arguments.length > 2) {
+            var args = Array.prototype.slice.call(arguments, 2);
+            return go.apply(this, args);
+        }
+        else {
+            return go;
+        }
+    };
+    async.applyEach = doParallel(_applyEach);
+    async.applyEachSeries = doSeries(_applyEach);
+
+    async.forever = function (fn, callback) {
+        function next(err) {
+            if (err) {
+                if (callback) {
+                    return callback(err);
+                }
+                throw err;
+            }
+            fn(next);
+        }
+        next();
+    };
+
+    // Node.js
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = async;
+    }
+    // AMD / RequireJS
+    else if (typeof define !== 'undefined' && define.amd) {
+        define([], function () {
+            return async;
+        });
+    }
+    // included directly via <script> tag
+    else {
+        root.async = async;
+    }
+
+}());
+
+}).call(this,require('_process'))
+},{"_process":48}],46:[function(require,module,exports){
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -2565,7 +4268,7 @@ module.exports = View.extend({
 
 }));
 
-},{"underscore":32}],32:[function(require,module,exports){
+},{"underscore":47}],47:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -4115,7 +5818,99 @@ module.exports = View.extend({
   }
 }.call(this));
 
-},{}],33:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            currentQueue[queueIndex].run();
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (!draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],49:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.4
  * http://jquery.com/
@@ -13327,6 +15122,6 @@ return jQuery;
 
 }));
 
-},{}],34:[function(require,module,exports){
-arguments[4][32][0].apply(exports,arguments)
-},{"dup":32}]},{},[1]);
+},{}],50:[function(require,module,exports){
+arguments[4][47][0].apply(exports,arguments)
+},{"dup":47}]},{},[1]);

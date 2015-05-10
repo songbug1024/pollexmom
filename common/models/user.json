@@ -14,6 +14,13 @@
     }
   },
   "properties": {
+    "userNumber": {
+      "type": "number",
+      "index": {"unique": true},
+      "oracle": {
+        "columnName": "USER_NUMBER"
+      }
+    },
     "weChatId": {
       "type": "string",
       "index": {"unique": true}
@@ -120,57 +127,29 @@
     "personalInfo": {
       "type": "hasOne",
       "model": "UserInfo",
-      "foreignKey": "userInfoId"
+      "foreignKey": "userId"
     },
     "deliveryInfo": {
       "type": "hasOne",
       "model": "UserDeliveryInfo",
-      "foreignKey": "userDeliveryInfoId"
+      "foreignKey": "userId"
     },
     "deliveryAddresses": {
       "type": "hasMany",
       "model": "UserDeliveryAddress",
-      "foreignKey": "userDeliveryAddressId"
+      "foreignKey": "userId"
     },
     "shoppingCart": {
       "type": "hasOne",
       "model": "ShoppingCart",
-      "foreignKey": "shoppingCartId"
+      "foreignKey": "userId"
     }
   },
   "acls": [
     {
       "principalType": "ROLE",
       "principalId": "$everyone",
-      "permission": "DENY"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "ALLOW",
-      "property": ["register", "login", "logout", "confirm", "verify"]
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$owner",
-      "permission": "DENY"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$owner",
-      "permission": "ALLOW",
-      "property": ["updateAttributes"]
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "admin",
       "permission": "ALLOW"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "admin",
-      "permission": "DENY",
-      "property": ["deleteById"]
     }
   ],
   "methods": [],

@@ -10,20 +10,27 @@ var Settings = require('../settings.json');
 var ProductModel = require('../models/product');
 var IndexPageView = require('../views/page-index');
 var ProductPageView = require('../views/page-product');
+var PersonalCenterView = require('../views/page-personal-center');
+var PersonalInfoView = require('../views/page-personal-info');
+var ShoppingCartView = require('../views/page-shopping-cart');
 
 module.exports = Router.extend({
   routes: {
     "": "index",
-    "product/:productId": "productDetail"
+    "product/:productId": "productDetail",
+    "personal-center": "personalCenter",
+    "personal-info": "personalInfo",
+    "shopping-cart": "shoppingCart"
+
   },
   initialize: function (options) {
 
   },
   index: function() {
     changePage({
-      selector: '#index-page',
-      elCreator: function (options) {
-        return new IndexPageView(options).render().el;
+      id: 'index-page',
+      viewCreator: function (options) {
+        return new IndexPageView(options).render();
       }
     });
   },
@@ -38,25 +45,63 @@ module.exports = Router.extend({
       existedPageEl.remove();
     }
     changePage({
-      selector: '#product-detail-page',
-      elCreator: function (options) {
-        return new ProductPageView(options).el;
+      id: 'product-detail-page',
+      viewCreator: function (options) {
+        return new ProductPageView(options);
       },
-      elCreatorOptions: {model: new ProductModel(product)}
+      viewCreatorOptions: {model: new ProductModel(product)}
     });
-
+  },
+  personalCenter: function() {
+    changePage({
+      id: 'persnal-center-page',
+      viewCreator: function (options) {
+        return new PersonalCenterView(options);
+      }
+    });
+  },
+  personalInfo: function() {
+    changePage({
+      id: 'personal-info-page',
+      viewCreator: function (options) {
+        return new PersonalInfoView(options);
+      }
+    });
+  },
+  shoppingCart: function() {
+    changePage({
+      id: 'shopping-cart-page',
+      viewCreator: function (options) {
+        return new ShoppingCartView(options);
+      },
+      cache: true,
+      refresh: true
+    });
   }
 });
 
+var allPages = {};
+
 function changePage(options) {
   options = options || {};
-  var selector = options.selector;
-  var elCreator = options.elCreator;
-  var existedPage = $(selector);
+  var id = options.id;
+  var viewCreator = options.viewCreator;
+  var existedPage = $('#' + id);
+  var view;
+
   if (!existedPage || existedPage.length <= 0) {
-    var el = elCreator(options.elCreatorOptions);
-    $('body').append(el);
-    existedPage = $(el);
+    view = viewCreator(options.viewCreatorOptions);
+    $('body').attr('data-page', id).append(view.el);
+    existedPage = view.$el;
+
+    if (options.cache) {
+      allPages[id] = view;
+    }
+
+  } else {
+    if (options.refresh && allPages[id]) {
+      allPages[id].trigger('refresh');
+    }
   }
   $('body .active[data-role="page"]').removeClass('active');
   existedPage.addClass('active');

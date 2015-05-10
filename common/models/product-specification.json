@@ -10,10 +10,6 @@
     }
   },
   "properties": {
-    "productId": {
-      "type": "number",
-      "required": true
-    },
     "name": {
       "type": "string",
       "required": true
@@ -59,7 +55,7 @@
     "product": {
       "type": "belongsTo",
       "model": "Product",
-      "foreignKey": "productId"
+      "foreignKey": "productSpecificationId"
     }
   },
   "acls": [],

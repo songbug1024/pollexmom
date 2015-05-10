@@ -2,7 +2,10 @@
   "apiRoot": "/api/",
   "env": "debug",
   "adBoardSize": 3,
+  "userId": "554f0563f0daa4001b3005ed",
   "locals": {
-    "indexProducts": "indexProducts"
+    "indexProducts": "pollexmom_indexProducts",
+    "userInfo": "pollexmom_userInfo",
+    "userShoppingCart": "pollexmom_userShoppingCart"
   }
 }

@@ -51,12 +51,12 @@
     "city": {
       "type": "belongsTo",
       "model": "City",
-      "foreignKey": "cityId"
+      "foreignKey": "regionId"
     },
     "towns": {
       "type": "hasMany",
       "model": "Town",
-      "foreignKey": "townId"
+      "foreignKey": "regionId"
     }
   },
   "acls": [],

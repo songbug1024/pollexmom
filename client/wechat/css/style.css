@@ -4,3 +4,12 @@
 .page[data-role='page'].active {
     display: block;
 }
+body[data-page='personal-center-page'] {
+    background:url(../images/bg2.png) repeat;
+}
+body[data-page='personal-info-page'] {
+    background:url(../images/bg3.png) repeat;
+}
+.top2_titleimg img {
+    -webkit-border-radius:50%; -moz-border-radius:50%; border-radius:50%;
+}

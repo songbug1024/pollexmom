@@ -4,7 +4,10 @@
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
-    "validateUpsert": true
+    "validateUpsert": true,
+    "mongodb": {
+      "collection": "c_ad_boards"
+    }
   },
   "properties": {
     "name": {

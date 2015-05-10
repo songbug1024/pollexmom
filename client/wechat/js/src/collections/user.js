@@ -4,9 +4,12 @@
  * @Date: 2015/5/9
  */
 var Collection = require('../base/collection');
-var Model = require('../models/product-spec');
+var Model = require('../models/user');
 
 module.exports = Collection.extend({
-  name: 'ProductSpec',
-  model: Model
+  name: 'User',
+  model: Model,
+  urlRoot: function () {
+    return this.baseUrl + 'users';
+  }
 });

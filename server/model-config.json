@@ -65,11 +65,11 @@
   },
   "ShoppingCart": {
     "dataSource": "mongodb",
-    "public": false
+    "public": true
   },
   "ShoppingCartItem": {
     "dataSource": "mongodb",
-    "public": false
+    "public": true
   },
   "Order": {
     "dataSource": "mongodb",

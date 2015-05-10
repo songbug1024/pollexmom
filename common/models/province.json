@@ -53,7 +53,7 @@
     "cities": {
       "type": "hasMany",
       "model": "City",
-      "foreignKey": "cityId"
+      "foreignKey": "provinceId"
     }
   },
   "acls": [

@@ -51,12 +51,12 @@
     "province": {
       "type": "belongsTo",
       "model": "Province",
-      "foreignKey": "provinceId"
+      "foreignKey": "cityId"
     },
     "regions": {
       "type": "hasMany",
       "model": "Region",
-      "foreignKey": "regionId"
+      "foreignKey": "cityId"
     }
   },
   "acls": [],
