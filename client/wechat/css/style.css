@@ -1,0 +1,6 @@
+.page[data-role='page'] {
+    display: none;
+}
+.page[data-role='page'].active {
+    display: block;
+}

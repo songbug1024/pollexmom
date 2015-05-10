@@ -1,0 +1,8 @@
+{
+  "apiRoot": "/api/",
+  "env": "debug",
+  "adBoardSize": 3,
+  "locals": {
+    "indexProducts": "indexProducts"
+  }
+}
