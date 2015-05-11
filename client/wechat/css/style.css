@@ -1,4 +1,69 @@
+@-webkit-keyframes moveToLeft {
+    to { -webkit-transform: translateX(-100%); }
+}
+@-moz-keyframes moveToLeft {
+    to { -moz-transform: translateX(-100%); }
+}
+@keyframes moveToLeft {
+    to { transform: translateX(-100%); }
+}
+
+@-webkit-keyframes moveToRight {
+    to { -webkit-transform: translateX(100%); }
+}
+@-moz-keyframes moveToRight {
+    to { -moz-transform: translateX(100%); }
+}
+@keyframes moveToRight {
+    to { transform: translateX(100%); }
+}
+
+@-webkit-keyframes moveFromRight {
+    from { -webkit-transform: translateX(100%); }
+}
+@-moz-keyframes moveFromRight {
+    from { -moz-transform: translateX(100%); }
+}
+@keyframes moveFromRight {
+    from { transform: translateX(100%); }
+}
+
+@-webkit-keyframes moveFromLeft {
+    from { -webkit-transform: translateX(-100%); }
+}
+@-moz-keyframes moveFromLeft {
+    from { -moz-transform: translateX(-100%); }
+}
+@keyframes moveFromLeft {
+    from { transform: translateX(-100%); }
+}
+
+.pt-page-moveToLeftEasing {
+    -webkit-animation: moveToLeft .7s ease-in-out both;
+    -moz-animation: moveToLeft .7s ease-in-out both;
+    animation: moveToLeft .7s ease-in-out both;
+}
+.pt-page-moveToRightEasing {
+    -webkit-animation: moveToRight .7s ease-in-out both;
+    -moz-animation: moveToRight .7s ease-in-out both;
+    animation: moveToRight .7s ease-in-out both;
+}
+.pt-page-moveFromRight {
+    -webkit-animation: moveFromRight .6s ease both;
+    -moz-animation: moveFromRight .6s ease both;
+    animation: moveFromRight .6s ease both;
+}
+.pt-page-moveFromLeft {
+    -webkit-animation: moveFromLeft .6s ease both;
+    -moz-animation: moveFromLeft .6s ease both;
+    animation: moveFromLeft .6s ease both;
+}
+
 .page[data-role='page'] {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    bottom: 0;
     display: none;
 }
 .page[data-role='page'].active {
@@ -12,4 +77,12 @@ body[data-page='personal-info-page'] {
 }
 .top2_titleimg img {
     -webkit-border-radius:50%; -moz-border-radius:50%; border-radius:50%;
+}
+.good_ggchioce li.choose {
+    width: 30%;
+}
+.specification-name {
+    color: #999;
+    font-size: 14px;
+    font-weight: normal;
 }

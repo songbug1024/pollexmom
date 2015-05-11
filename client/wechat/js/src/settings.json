@@ -13,8 +13,12 @@
     "userInfo": "pollexmom_userInfo",
     "userShoppingCart": "pollexmom_userShoppingCart",
     "userDeliveryAddress": "pollexmom_userDeliveryAddress",
-    "userDeliveryInfo": "pollexmom_userDeliveryInfo"
+    "userDeliveryInfo": "pollexmom_userDeliveryInfo",
+    "userTobePaidOrders": "pollexmom_userTobePaidOrders",
+    "userAllOrders": "pollexmom_userAllOrders",
+    "userReceiptOrders": "pollexmom_userReceiptOrders"
   },
+  "pageSize": 20,
   "defaults": {
     "orderState": 0
   }

@@ -23,7 +23,8 @@ module.exports = View.extend({
     'click .good_ggchioce>li': 'switchSpecEvent',
     'click .good_num .decrease': 'decreaseNumEvent',
     'click .good_num .increase': 'increaseNumEvent',
-    'click .good_btn_go': 'addIntoShoppingCartEvent'
+    'click .good_btn_go': 'addIntoShoppingCartEvent',
+    'click .good_btn_buy': 'goToOrderEvent'
   },
   initialize: function () {
     this.listenTo(this.model.get('chooseSpecModel'), 'change', this.render);
@@ -71,10 +72,17 @@ module.exports = View.extend({
   increaseNumEvent: function (e) {
     this.setPurchaseNum(e, true);
   },
-  addIntoShoppingCartEvent: function (e) {
+  addIntoShoppingCartEvent: function (e, success, error) {
     var chooseSpecIndex = this.model.get('chooseSpecIndex');
     var chooseSpecModel = this.model.get('chooseSpecModel');
     var selected = chooseSpecIndex >= 0 && chooseSpecModel.id && !_.isEmpty(chooseSpecModel.attributes);
+
+    success = success || function () {
+      alert('添加成功!');
+    };
+    error = error || function () {
+      alert('添加失败!');
+    };
 
     if (!selected) {
       // TODO show waring
@@ -90,15 +98,16 @@ module.exports = View.extend({
         productName: this.model.get('name'),
         productPreviewImage: this.model.get('previewImagesJson')[0] || '',
         specificationId: chooseSpecModel.id,
+        specificationName: chooseSpecModel.get('name'),
+        specificationUnit: chooseSpecModel.get('unit'),
         price: chooseSpecModel.get('price'),
         referencePrice: chooseSpecModel.get('referencePrice'),
         count: count
       });
 
       var storedShoppingCart = localStorage.getItem(Settings.locals.userShoppingCart);
-      if (storedShoppingCart) {
-        storedShoppingCart = JSON.parse(storedShoppingCart);
-
+      storedShoppingCart = JSON.parse(storedShoppingCart);
+      if (storedShoppingCart && storedShoppingCart.id) {
         var productId = shoppingCartItemModel.get('productId');
         var specificationId = shoppingCartItemModel.get('specificationId');
         var items = storedShoppingCart.items;
@@ -116,13 +125,13 @@ module.exports = View.extend({
             if (!existedItem) {
               storedShoppingCart.items.push(model.attributes);
             }
-            alert('添加成功!');
+            success(model.attributes);
             console.log('Added into shopping cart success!', model);
             localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(storedShoppingCart));
           },
           error: function (model, err) {
             console.error('Error: ' + err);
-            alert('添加失败!');
+            error();
           }
         });
 
@@ -192,7 +201,7 @@ module.exports = View.extend({
           }
         ], function (err, model, shoppingCart, append) {
           if (err) {
-            alert('添加失败!');
+            error();
             return console.error('Error: ' + err);
           }
           console.log('Added into shopping cart success!', model);
@@ -201,10 +210,17 @@ module.exports = View.extend({
             shoppingCart.get('items').push(model.attributes);
           }
           localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(shoppingCart.toJSON()));
-          alert('添加成功!');
+          success(model.attributes);
         });
 
       }
     }
+  },
+  goToOrderEvent: function (e) {
+    this.addIntoShoppingCartEvent(e, function(item) {
+      window.pollexmomApp.navigate("/generate-order/" + item.id, {trigger: true});
+    }, function () {
+      alert('下单失败！');
+    })
   }
 });

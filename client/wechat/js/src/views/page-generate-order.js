@@ -146,6 +146,8 @@ module.exports = Page.extend({
         productName: item.productName,
         productPreviewImage: item.productPreviewImage,
         specificationId: item.specificationId,
+        specificationName: item.specificationName,
+        specificationUnit: item.specificationUnit,
         price: item.price,
         referencePrice: item.referencePrice,
         count: item.count
@@ -172,6 +174,7 @@ module.exports = Page.extend({
   },
   renderOrderInfo: function () {
     var details = this.orderItemsCollection;
+
     var view = new OrderDetailsView({
       order: this.order,
       details: details,
@@ -256,6 +259,7 @@ module.exports = Page.extend({
         alert('创建订单失败!');
         return console.error('Error: ' + err);
       }
+      localStorage.removeItem(Settings.locals.userShoppingCart);
       window.pollexmomApp.navigate("/order-success", {trigger: true});
     });
   }

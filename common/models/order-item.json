@@ -26,6 +26,13 @@
       "type": "string",
       "required": true
     },
+    "specificationName": {
+      "type": "string",
+      "required": true
+    },
+    "specificationUnit": {
+      "type": "string"
+    },
     "price": {
       "type": "number",
       "required": true

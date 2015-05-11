@@ -45,13 +45,13 @@ module.exports = Page.extend({
     if (!model) {
       var storedModel = localStorage.getItem(Settings.locals.userShoppingCart);
       storedModel = JSON.parse(storedModel) || {};
-      this.model.set(storedModel);
-    }
 
-    model = model || this.model;
-    if (model && model.id) {
+      this.model.clear();
+      this.model.set(storedModel);
+    } else {
       localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(model.toJSON()));
     }
+    model = model || this.model;
 
     this.$el.empty();
     this.$el.html(this.template(model.attributes));
