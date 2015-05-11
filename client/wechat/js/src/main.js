@@ -16,6 +16,6 @@ Backbone.$ = $;
 
 
 var IndexRoute = require('./routers/index');
-new IndexRoute();
 
+window.pollexmomApp = new IndexRoute();
 Backbone.history.start({pushState: false, root: "/wechat/"});

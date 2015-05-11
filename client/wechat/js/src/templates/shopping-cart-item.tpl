@@ -1,4 +1,4 @@
-<li class="gwc_item_sel"><a href="javascript:;" class="dx_sel"></a></li>
+<li class="gwc_item_sel"><a href="javascript:;" class="select-item dx_sel"></a></li>
 <li class="gwc_itme_bd">
     <div class="fl gwc_img"><a href="#product/{{=productId}}"><img src="{{=productPreviewImage}}"></a></div>
     <div class="fl gwc_rinfo">

@@ -33,7 +33,7 @@
   },
   "UserDeliveryAddress": {
     "dataSource": "mongodb",
-    "public": false
+    "public": true
   },
   "Province": {
     "dataSource": "mongodb",
@@ -77,7 +77,7 @@
   },
   "OrderItem": {
     "dataSource": "mongodb",
-    "public": false
+    "public": true
   },
   "AdBoard": {
     "dataSource": "mongodb",

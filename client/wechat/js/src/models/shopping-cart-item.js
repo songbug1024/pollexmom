@@ -6,7 +6,10 @@
 var Model = require('../base/model');
 
 module.exports = Model.extend({
-  name: 'ShoppingCart',
+  name: 'ShoppingCartItem',
+  defaults: {
+    checked: false
+  },
   urlRoot: function () {
     return this.baseUrl + 'shopping-cart-items';
   },

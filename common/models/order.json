@@ -14,12 +14,16 @@
       "type": "string",
       "required": true
     },
-    "consumerId": {
-      "type": "number",
+    "dietitianId": {
+      "type": "string",
       "required": true
     },
-    "dietitianId": {
-      "type": "number",
+    "dietitianName": {
+      "type": "string",
+      "required": true
+    },
+    "dietitianTel": {
+      "type": "string",
       "required": true
     },
     "status": {
@@ -39,12 +43,10 @@
       "required": true
     },
     "shippingParty": {
-      "type": "number",
-      "required": true
+      "type": "number"
     },
     "receivingParty": {
-      "type": "number",
-      "required": true
+      "type": "number"
     },
     "provinceId": {
       "type": "number"
@@ -76,6 +78,11 @@
     "items": {
       "type": "hasMany",
       "model": "OrderItem",
+      "foreignKey": "orderId"
+    },
+    "consumer": {
+      "type": "belongsTo",
+      "model": "user",
       "foreignKey": "orderId"
     }
   },

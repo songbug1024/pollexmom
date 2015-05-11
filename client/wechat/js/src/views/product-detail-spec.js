@@ -143,7 +143,7 @@ module.exports = View.extend({
                 }
 
                 // not create shopping cart before
-                model.url = model.urlRoot();
+                model.url = model.checkUrl();
                 model.save(model.attributes, {
                   success: function (model) {
                     callback(null, model);

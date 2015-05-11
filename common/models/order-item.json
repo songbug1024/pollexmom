@@ -11,7 +11,7 @@
   },
   "properties": {
     "productId": {
-      "type": "number",
+      "type": "string",
       "required": true
     },
     "productName": {
@@ -23,7 +23,7 @@
       "required": true
     },
     "specificationId": {
-      "type": "number",
+      "type": "string",
       "required": true
     },
     "price": {

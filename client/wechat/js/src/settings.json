@@ -3,9 +3,19 @@
   "env": "debug",
   "adBoardSize": 3,
   "userId": "554f0563f0daa4001b3005ed",
+  "order": {
+    "dietitianId": "554f04bdf0daa4001b3005ec",
+    "dietitianName": "彭博",
+    "dietitianTel": "13800138000"
+  },
   "locals": {
     "indexProducts": "pollexmom_indexProducts",
     "userInfo": "pollexmom_userInfo",
-    "userShoppingCart": "pollexmom_userShoppingCart"
+    "userShoppingCart": "pollexmom_userShoppingCart",
+    "userDeliveryAddress": "pollexmom_userDeliveryAddress",
+    "userDeliveryInfo": "pollexmom_userDeliveryInfo"
+  },
+  "defaults": {
+    "orderState": 0
   }
 }

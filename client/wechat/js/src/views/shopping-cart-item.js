@@ -18,9 +18,11 @@ module.exports = View.extend({
   template: _.template(template),
   events: {
     'click .good_num .increase': 'increaseNumEvent',
-    'click .good_num .decrease': 'decreaseNumEvent'
+    'click .good_num .decrease': 'decreaseNumEvent',
+    'click .select-item': 'itemSelectEvent'
   },
   initialize: function () {
+    this.listenTo(this.model, 'change:checked', this.checkedChangeHandler);
   },
   render: function () {
     this.$el.empty();
@@ -47,6 +49,16 @@ module.exports = View.extend({
           inputEl.val(model.get('count'));
         }
       });
+    }
+  },
+  itemSelectEvent: function(e) {
+    this.model.set('checked', !this.model.get('checked'));
+  },
+  checkedChangeHandler: function (model, checked) {
+    if (checked) {
+      this.$el.find('.select-item').removeClass('dx_sel').addClass('dx_sel_active');
+    } else {
+      this.$el.find('.select-item').removeClass('dx_sel_active').addClass('dx_sel');
     }
   }
 });

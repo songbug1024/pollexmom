@@ -10,7 +10,7 @@ module.exports = Model.extend({
   defaults: {
     items: [],
     amountPrice: 0,
-    checkPrice: 0
+    checkedPrice: 0
   },
   urlRoot: function () {
     return this.baseUrl + 'shopping-carts';

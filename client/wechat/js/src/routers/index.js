@@ -13,6 +13,9 @@ var ProductPageView = require('../views/page-product');
 var PersonalCenterView = require('../views/page-personal-center');
 var PersonalInfoView = require('../views/page-personal-info');
 var ShoppingCartView = require('../views/page-shopping-cart');
+var GenerateOrderView = require('../views/page-generate-order');
+var DeliveryAddressView = require('../views/page-edit-delivery-address');
+var OrderSuccessView = require('../views/page-order-success');
 
 module.exports = Router.extend({
   routes: {
@@ -20,11 +23,13 @@ module.exports = Router.extend({
     "product/:productId": "productDetail",
     "personal-center": "personalCenter",
     "personal-info": "personalInfo",
-    "shopping-cart": "shoppingCart"
-
+    "shopping-cart": "shoppingCart",
+    "generate-order/:ids": "generateOrder",
+    "generate-order/:ids/delivery-address/:addressId": "deliveryAddress",
+    "generate-order/:ids/delivery-time": "deliveryTime",
+    "order-success": "orderSuccess"
   },
   initialize: function (options) {
-
   },
   index: function() {
     changePage({
@@ -77,6 +82,44 @@ module.exports = Router.extend({
       cache: true,
       refresh: true
     });
+  },
+  generateOrder: function(ids) {
+    changePage({
+      id: 'generate-order-page',
+      viewCreator: function (options) {
+        return new GenerateOrderView(options).render();
+      },
+      removeWhenHide: true,
+      viewCreatorOptions: {
+        ids: ids
+      }
+    });
+  },
+  deliveryAddress: function(ids, addressId) {
+    if (addressId === 'null') addressId = null;
+
+    changePage({
+      id: 'delivery-address-page',
+      viewCreator: function (options) {
+        return new DeliveryAddressView(options).render();
+      },
+      removeWhenHide: true,
+      viewCreatorOptions: {
+        ids: ids,
+        id: addressId
+      }
+    });
+  },
+  deliveryTime: function () {
+    // TODO
+  },
+  orderSuccess: function () {
+    changePage({
+      id: 'order-success-page',
+      viewCreator: function (options) {
+        return new OrderSuccessView(options).render();
+      }
+    });
   }
 });
 
@@ -103,6 +146,11 @@ function changePage(options) {
       allPages[id].trigger('refresh');
     }
   }
-  $('body .active[data-role="page"]').removeClass('active');
+
+  var activePageEl = $('body .active[data-role="page"]');
+  activePageEl.removeClass('active');
+
+  if (options.removeWhenHide) activePageEl.remove();
+
   existedPage.addClass('active');
 }

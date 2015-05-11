@@ -143,6 +143,11 @@
       "type": "hasOne",
       "model": "ShoppingCart",
       "foreignKey": "userId"
+    },
+    "orders": {
+      "type": "hasMany",
+      "model": "Order",
+      "foreignKey": "consumerId"
     }
   },
   "acls": [
