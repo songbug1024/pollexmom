@@ -48,23 +48,26 @@ module.exports = Page.extend({
     var self = this;
     var collection;
     var storedOrders;
+    var localKey;
 
     switch (type) {
       case 'tobePaid':
         collection = this.tobePaidOrders;
-        storedOrders = localStorage.getItem(Settings.locals.userTobePaidOrders);
+        localKey = Settings.locals.userTobePaidOrders;
         break;
       case 'all':
         collection = this.allOrders;
-        storedOrders = localStorage.getItem(Settings.locals.userAllOrders);
+        localKey = Settings.locals.userAllOrders;
         break;
       case 'receipt':
         collection = this.receiptOrders;
-        storedOrders = localStorage.getItem(Settings.locals.userReceiptOrders);
+        localKey = Settings.locals.userReceiptOrders;
         break;
       default:
         break;
     }
+
+    storedOrders = localStorage.getItem(localKey);
 
     if (storedOrders && storedOrders.length > 0) {
       collection.reset(storedOrders);
@@ -73,6 +76,8 @@ module.exports = Page.extend({
       collection.fetch({
         success: function (collection) {
           self.renderOrders(collection, type);
+
+          localStorage.setItem(localKey, collection.toJSON());
         },
         error: function (collection, err) {
           console.error('Fetch orders error: ' + err);
@@ -83,9 +88,10 @@ module.exports = Page.extend({
   },
   renderOrders: function (collection, type) {
     this.$el.find('.order-type-tab.active').removeClass('active');
-    this.$el.find('.order-type-tab.active').removeClass('active');
+    this.$el.find('.order-list.active').removeClass('active');
 
     this.$el.find('.order-type-tab[data-type="' + type + '"]').addClass('active');
+    this.$el.find('.order-list[data-type="' + type + '"]').addClass('active');
 
     if (collection) {
 

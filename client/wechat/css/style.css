@@ -86,3 +86,9 @@ body[data-page='personal-info-page'] {
     font-size: 14px;
     font-weight: normal;
 }
+#my-orders-page .order-list {
+    display: none;
+}
+#my-orders-page .order-list.active {
+    display: block;
+}

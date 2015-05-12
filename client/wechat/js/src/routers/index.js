@@ -131,7 +131,7 @@ module.exports = Router.extend({
     changePage({
       id: 'my-orders-page',
       viewCreator: function (options) {
-        return new MyOrdersView(options);
+        return new MyOrdersView(options).render();
       },
       cache: true,
       refresh: true

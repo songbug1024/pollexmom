@@ -6,12 +6,12 @@
     <div class="user_dd">
         <div class="user_dd_zt">
             <ul id="myTab0" class="control-group">
-                <li data-type="tobePaid" class="order-type-tab" onclick="nTabs(this,0);">待支付</li>
-                <li data-type="receipt"  class="order-type-tab" onclick="nTabs(this,1);">待收货</li>
-                <li data-type="all"  class="order-type-tab" onclick="nTabs(this,2);">全部</li>
+                <li data-type="tobePaid" class="order-type-tab">待支付</li>
+                <li data-type="receipt"  class="order-type-tab">待收货</li>
+                <li data-type="all"  class="order-type-tab">全部</li>
             </ul>
         </div>
-        <div  id="myTab0_Content0" class="tobe-paid-orders user_dd_cont">
+        <div  id="myTab0_Content0" class="order-list user_dd_cont" data-type="tobePaid">
             <ul class="user_dd_item clearfix">
                 <li><a href="#"><img src="images/p1.jpg"></a></li>
                 <li>
@@ -25,7 +25,7 @@
                 </li>
             </ul>
         </div>
-        <div  id="myTab0_Content1" class="receipt-orders user_dd_cont">
+        <div  id="myTab0_Content1" class="order-list user_dd_cont" data-type="receipt">
             <ul class="user_dd_item clearfix">
                 <li><a href="#"><img src="images/p1.jpg"></a></li>
                 <li>
@@ -39,7 +39,7 @@
                 </li>
             </ul>
         </div>
-        <div  id="myTab0_Content2" class="all-orders user_dd_cont">
+        <div  id="myTab0_Content2" class="order-list user_dd_cont" data-type="all">
             <ul class="user_dd_item clearfix">
                 <li><a href="#"><img src="images/p1.jpg"></a></li>
                 <li>
