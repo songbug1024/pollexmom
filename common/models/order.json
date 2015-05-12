@@ -61,7 +61,8 @@
       "type": "number"
     },
     "created": {
-      "type": "date"
+      "type": "date",
+      "defaultFn": "now"
     },
     "createdBy": {
       "type": "string"
@@ -86,6 +87,7 @@
       "foreignKey": "orderId"
     }
   },
-  "acls": [],
+  "acls": [
+  ],
   "methods": []
 }

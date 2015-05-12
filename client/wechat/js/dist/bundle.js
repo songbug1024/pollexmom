@@ -20,7 +20,7 @@ var IndexRoute = require('./routers/index');
 
 window.pollexmomApp = new IndexRoute();
 Backbone.history.start({pushState: false, root: "/wechat/"});
-},{"./routers/index":25,"backbone":72,"jquery":75,"underscore":76}],2:[function(require,module,exports){
+},{"./routers/index":25,"backbone":76,"jquery":79,"underscore":80}],2:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -55,7 +55,7 @@ _.extend(Collection, RestQueryString, {
 });
 
 module.exports = Backbone.Collection.extend(Collection);
-},{"../settings.json":26,"./rest-querystring":5,"backbone":72,"underscore":76}],3:[function(require,module,exports){
+},{"../settings.json":26,"./rest-querystring":5,"backbone":76,"underscore":80}],3:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -92,7 +92,7 @@ _.extend(Model, RestQueryString, {
 });
 
 module.exports = Backbone.Model.extend(Model);
-},{"../settings.json":26,"./rest-querystring":5,"backbone":72,"underscore":76}],4:[function(require,module,exports){
+},{"../settings.json":26,"./rest-querystring":5,"backbone":76,"underscore":80}],4:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -283,7 +283,7 @@ module.exports = {
     return this;
   }
 };
-},{"../settings.json":26,"underscore":76}],6:[function(require,module,exports){
+},{"../settings.json":26,"underscore":80}],6:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -296,7 +296,7 @@ module.exports = Backbone.Router.extend({
 
   }
 });
-},{"backbone":72}],7:[function(require,module,exports){
+},{"backbone":76}],7:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -329,7 +329,7 @@ module.exports = Backbone.View.extend({
     }
   }
 });
-},{"../settings.json":26,"backbone":72}],8:[function(require,module,exports){
+},{"../settings.json":26,"backbone":76}],8:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -419,7 +419,7 @@ module.exports = Collection.extend({
     return count;
   }
 });
-},{"../base/collection":2,"../models/order-item":18,"underscore":76}],11:[function(require,module,exports){
+},{"../base/collection":2,"../models/order-item":18,"underscore":80}],11:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -445,14 +445,18 @@ module.exports = Collection.extend({
     return this.baseUrl + 'users/' + userId + '/orders';
   },
   allUrl: function () {
-    var queryString = this.qIncludes({items: ''}).qLimit(Settings.pageSize).qEnd();
+    var queryString = this.qIncludes({items: ''})
+      .qLimit(Settings.pageSize)
+      .qOrder({id: 'DESC'})
+      .qEnd();
 
     return this.userRelationUrl() + '?' + queryString;
   },
   tobePaidUrl: function () {
     var queryString = this.qIncludes({items: ''})
       .qLimit(Settings.pageSize)
-      .qWhere({status: 0}) // 待支付
+      .qWhere({status: 98}) // 待支付
+      .qOrder({id: 'DESC'})
       .qEnd();
 
     return this.userRelationUrl() + '?' + queryString;
@@ -460,13 +464,14 @@ module.exports = Collection.extend({
   receiptUrl: function () {
     var queryString = this.qIncludes({items: ''})
       .qLimit(Settings.pageSize)
-      .qWhere({status: 3}) // 待收货
+      .qWhere({status: 5}) // 待收货
+      .qOrder({id: 'DESC'})
       .qEnd();
 
     return this.userRelationUrl() + '?' + queryString;
   }
 });
-},{"../base/collection":2,"../models/order":19,"../settings.json":26,"underscore":76}],12:[function(require,module,exports){
+},{"../base/collection":2,"../models/order":19,"../settings.json":26,"underscore":80}],12:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -852,6 +857,7 @@ module.exports = Model.extend({
  * @Author: fuwensong
  * @Date: 2015/5/9
  */
+var _ = require('underscore');
 var Model = require('../base/model');
 
 module.exports = Model.extend({
@@ -868,9 +874,19 @@ module.exports = Model.extend({
   },
   url: function () {
     return this.urlRoot() + (this.id ? ('/' + this.id) : '');
+  },
+  amountItemsCount: function() {
+    return _.reduce(this.get('items'), function(memo, item){
+      return memo + item.count;
+    }, 0);
+  },
+  amountItemsPrice: function() {
+    return _.reduce(this.get('items'), function(memo, item){
+      return memo + item.price * item.count;
+    }, 0);
   }
 });
-},{"../base/model":3}],20:[function(require,module,exports){
+},{"../base/model":3,"underscore":80}],20:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -909,6 +925,7 @@ var ProductSpecModel = require('./product-spec');
 module.exports = Model.extend({
   name: 'Product',
   defaults: {
+    inventoryCount: 0,
     chooseSpecIndex: -1,
     previewImages: "[]",
     detailImages: "[]",
@@ -945,14 +962,16 @@ module.exports = Model.extend({
     var specifications = model.get('specifications');
     var chooseSpecModel = model.get('chooseSpecModel');
 
+    chooseSpecModel.clear();
     if (value >= 0 && specifications && !_.isEmpty(specifications)) {
+//      var unionProperties = _.union(_.keys(chooseSpecModel.attributes), _.keys(specifications[value]));
+//      _.pick(specifications[value], unionProperties);
+
       chooseSpecModel.set(specifications[value]);
-    } else {
-      chooseSpecModel.clear();
     }
   }
 });
-},{"../base/model":3,"./product-spec":20,"underscore":76}],22:[function(require,module,exports){
+},{"../base/model":3,"./product-spec":20,"underscore":80}],22:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -1058,7 +1077,7 @@ module.exports = Model.extend({
     return this.urlRoot() + '/personal-info?id=' + this.id;
   }
 });
-},{"../base/model":3,"underscore":76}],25:[function(require,module,exports){
+},{"../base/model":3,"underscore":80}],25:[function(require,module,exports){
 /**
  * @Description: Index Route
  * @Author: fuwensong
@@ -1086,13 +1105,19 @@ module.exports = Router.extend({
     "": "index",
     "product/:productId": "productDetail",
     "personal-center": "personalCenter",
+    "personal-center/personal-info": "personalInfo",
     "personal-info": "personalInfo",
     "shopping-cart": "shoppingCart",
     "generate-order/:ids": "generateOrder",
     "generate-order/:ids/delivery-address/:addressId": "deliveryAddress",
     "generate-order/:ids/delivery-time": "deliveryTime",
     "order-success": "orderSuccess",
+
+    "personal-center/my-orders": "myOrders",
     "my-orders": "myOrders",
+    "personal-center/my-orders/:type": "myOrders",
+    "my-orders/:type": "myOrders",
+
     "search": "search", // TODO
     "category": "category"
   },
@@ -1156,10 +1181,11 @@ module.exports = Router.extend({
       viewCreator: function (options) {
         return new GenerateOrderView(options).render();
       },
-      removeWhenHide: true,
       viewCreatorOptions: {
         ids: ids
-      }
+      },
+      cache: true,
+      refresh: true
     });
   },
   deliveryAddress: function(ids, addressId) {
@@ -1173,7 +1199,7 @@ module.exports = Router.extend({
       removeWhenHide: true,
       viewCreatorOptions: {
         ids: ids,
-        id: addressId
+        addressId: addressId
       }
     });
   },
@@ -1188,14 +1214,17 @@ module.exports = Router.extend({
       }
     });
   },
-  myOrders: function () {
+  myOrders: function (type) {
     changePage({
       id: 'my-orders-page',
       viewCreator: function (options) {
-        return new MyOrdersView(options);
+        return new MyOrdersView(options).render();
       },
       cache: true,
-      refresh: true
+      refresh: true,
+      viewCreatorOptions: {
+        type: type
+      }
     });
   },
   search: function () {
@@ -1220,29 +1249,38 @@ var allPages = {};
 
 function changePage(options) {
   options = options || {};
+
   var id = options.id;
   var viewCreator = options.viewCreator;
   var existedPage = $('#' + id);
   var view;
   var containerEl = $('body');
+  var page = allPages[id];
 
-  containerEl.attr('data-page', id)
+  allPages[id] = page = page || {};
+  page.cache = options.cache;
+  page.removeWhenHide = options.removeWhenHide;
+  page.refresh = options.refresh;
+
+  containerEl.attr('data-page', id);
   if (!existedPage || existedPage.length <= 0) {
     view = viewCreator(options.viewCreatorOptions);
     containerEl.append(view.el);
     existedPage = view.$el;
 
-    if (options.cache) {
-      allPages[id] = view;
+    if (page.cache) {
+      page.view = view;
     }
 
   } else {
-    if (options.refresh && allPages[id]) {
-      allPages[id].trigger('refresh');
+    if (page.refresh && page.cache) {
+      page.view.trigger('refresh');
     }
   }
 
   var activePageEl = $('body .active[data-role="page"]');
+  var activePageId = activePageEl.attr('id');
+  var activePage = allPages[activePageId];
 
   existedPage.fadeIn(350, function () {
     existedPage.addClass('active');
@@ -1251,10 +1289,11 @@ function changePage(options) {
   activePageEl.fadeOut(350, function () {
     activePageEl.removeClass('active');
 
-    if (options.removeWhenHide) activePageEl.remove();
+    if (activePage.removeWhenHide) activePageEl.remove();
   });
 }
-},{"../base/router":6,"../models/product":21,"../settings.json":26,"../views/page-category":55,"../views/page-edit-delivery-address":56,"../views/page-generate-order":57,"../views/page-index":58,"../views/page-my-orders":59,"../views/page-order-success":60,"../views/page-personal-center":61,"../views/page-personal-info":62,"../views/page-product":63,"../views/page-search":64,"../views/page-shopping-cart":65,"jquery":75,"underscore":76}],26:[function(require,module,exports){
+
+},{"../base/router":6,"../models/product":21,"../settings.json":26,"../views/page-category":59,"../views/page-edit-delivery-address":60,"../views/page-generate-order":61,"../views/page-index":62,"../views/page-my-orders":63,"../views/page-order-success":64,"../views/page-personal-center":65,"../views/page-personal-info":66,"../views/page-product":67,"../views/page-search":68,"../views/page-shopping-cart":69,"jquery":79,"underscore":80}],26:[function(require,module,exports){
 module.exports={
   "apiRoot": "/api/",
   "env": "debug",
@@ -1277,7 +1316,7 @@ module.exports={
   },
   "pageSize": 20,
   "defaults": {
-    "orderState": 0
+    "orderState": 98
   }
 }
 },{}],27:[function(require,module,exports){
@@ -1311,39 +1350,45 @@ module.exports = "<div class=\"delivery-info sh_bd clearfix\">\r\n</div>\r\n<div
 module.exports = "<div class=\"index_topimg\"><img src=\"images/top.png\"></div>\r\n<div class=\"index_btn_so\"><a href=\"#search\"></a></div>\r\n<div class=\"clear\"></div>\r\n";
 
 },{}],37:[function(require,module,exports){
-module.exports = "<div class=\"top2 clearfix\">\r\n    <h2 class=\"top2_titleimg\"><img src=\"images/btn_dingdan.png\" width=\"65\" height=\"65\"></h2>\r\n</div>\r\n<h1 class=\"top_title\">我的订单</h1>\r\n<div class=\"w\">\r\n    <div class=\"user_dd\">\r\n        <div class=\"user_dd_zt\">\r\n            <ul id=\"myTab0\" class=\"control-group\">\r\n                <li data-type=\"tobePaid\" class=\"order-type-tab\" onclick=\"nTabs(this,0);\">待支付</li>\r\n                <li data-type=\"receipt\"  class=\"order-type-tab\" onclick=\"nTabs(this,1);\">待收货</li>\r\n                <li data-type=\"all\"  class=\"order-type-tab\" onclick=\"nTabs(this,2);\">全部</li>\r\n            </ul>\r\n        </div>\r\n        <div  id=\"myTab0_Content0\" class=\"tobe-paid-orders user_dd_cont\">\r\n            <ul class=\"user_dd_item clearfix\">\r\n                <li><a href=\"#\"><img src=\"images/p1.jpg\"></a></li>\r\n                <li>\r\n                    <div class=\"user_dd_rtop clearfix\">\r\n                        <p class=\"p_title\"><a href=\"#\">圣元优博58 2段婴幼儿奶粉</a></p>\r\n                        <p class=\"p_price\">￥288</p>\r\n                    </div>\r\n                    <div class=\"user_dd_rbot clearfix\">\r\n                        <a href=\"#\" class=\"btn_ddfk\">去下单</a>\r\n                    </div>\r\n                </li>\r\n            </ul>\r\n        </div>\r\n        <div  id=\"myTab0_Content1\" class=\"receipt-orders user_dd_cont\">\r\n            <ul class=\"user_dd_item clearfix\">\r\n                <li><a href=\"#\"><img src=\"images/p1.jpg\"></a></li>\r\n                <li>\r\n                    <div class=\"user_dd_rtop clearfix\">\r\n                        <p class=\"p_title\"><a href=\"#\">圣元优博58 2段婴幼儿奶粉</a></p>\r\n                        <p class=\"p_price\">￥288</p>\r\n                    </div>\r\n                    <div class=\"user_dd_rbot clearfix\">\r\n                        <a href=\"#\" class=\"btn_ddfk\">等待收货</a>\r\n                    </div>\r\n                </li>\r\n            </ul>\r\n        </div>\r\n        <div  id=\"myTab0_Content2\" class=\"all-orders user_dd_cont\">\r\n            <ul class=\"user_dd_item clearfix\">\r\n                <li><a href=\"#\"><img src=\"images/p1.jpg\"></a></li>\r\n                <li>\r\n                    <div class=\"user_dd_rtop clearfix\">\r\n                        <p class=\"p_title\"><a href=\"#\">圣元优博58 2段婴幼儿奶粉</a></p>\r\n                        <p class=\"p_price\">￥288</p>\r\n                    </div>\r\n                    <div class=\"user_dd_rbot clearfix\">\r\n                        <a href=\"#\" class=\"btn_ddfk\">去付款</a><a href=\"#\" class=\"btn_ddfk\">取消订单</a>\r\n                    </div>\r\n                </li>\r\n            </ul>\r\n            <ul class=\"user_dd_item clearfix\">\r\n                <li><a href=\"#\"><img src=\"images/p1.jpg\"></a></li>\r\n                <li>\r\n                    <div class=\"user_dd_rtop clearfix\">\r\n                        <p class=\"p_title\"><a href=\"#\">圣元优博58 2段婴幼儿奶粉</a></p>\r\n                        <p class=\"p_price\">￥288</p>\r\n                    </div>\r\n                    <div class=\"user_dd_rbot clearfix\">\r\n                        <a href=\"#\" class=\"btn_ddfk\">去付款</a><a href=\"#\" class=\"btn_ddfk\">取消订单</a>\r\n                    </div>\r\n                </li>\r\n            </ul>\r\n            <ul class=\"user_dd_item clearfix\">\r\n                <li><a href=\"#\"><img src=\"images/p1.jpg\"></a></li>\r\n                <li>\r\n                    <div class=\"user_dd_rtop clearfix\">\r\n                        <p class=\"p_title\"><a href=\"#\">圣元优博58 2段婴幼儿奶粉</a></p>\r\n                        <p class=\"p_price\">￥288</p>\r\n                    </div>\r\n                    <div class=\"user_dd_rbot clearfix\">\r\n                        <a href=\"#\" class=\"btn_ddfk\">去付款</a><a href=\"#\" class=\"btn_ddfk\">取消订单</a>\r\n                    </div>\r\n                </li>\r\n            </ul>\r\n        </div>\r\n    </div>\r\n</div>";
+module.exports = "<div class=\"top2 clearfix\">\r\n    <h2 class=\"top2_titleimg\"><img src=\"images/btn_dingdan.png\" width=\"65\" height=\"65\"></h2>\r\n</div>\r\n<h1 class=\"top_title\">我的订单</h1>\r\n<div class=\"w\">\r\n    <div class=\"user_dd\">\r\n        <div class=\"user_dd_zt\">\r\n            <ul id=\"myTab0\" class=\"control-group\">\r\n                <li data-type=\"tobePaid\" class=\"order-type-tab\">待支付</li>\r\n                <li data-type=\"receipt\"  class=\"order-type-tab\">待收货</li>\r\n                <li data-type=\"all\"  class=\"order-type-tab\">全部</li>\r\n            </ul>\r\n        </div>\r\n        <div  id=\"myTab0_Content0\" class=\"order-list user_dd_cont\" data-type=\"tobePaid\">\r\n        </div>\r\n        <div  id=\"myTab0_Content1\" class=\"order-list user_dd_cont\" data-type=\"receipt\">\r\n        </div>\r\n        <div  id=\"myTab0_Content2\" class=\"order-list user_dd_cont\" data-type=\"all\">\r\n        </div>\r\n    </div>\r\n</div>";
 
 },{}],38:[function(require,module,exports){
-module.exports = "<div class=\"success-main w\">\r\n    <div class=\"blank20\"></div>\r\n    <p class=\"ok\"></p>\r\n    <p class=\"noCar_info\">订单提交成功！</p>\r\n</div>";
+module.exports = "<li><a href=\"#product/{{=productId}}\"><img src=\"{{=productPreviewImage}}\"></a></li>\r\n<li>\r\n    <div class=\"user_dd_rtop clearfix\">\r\n        <p class=\"p_title\"><a href=\"#product/{{=productId}}\">{{=productName}}</a></p>\r\n        <p class=\"p_price\">￥{{=price}}</p>\r\n    </div>\r\n    <div class=\"user_dd_rbot clearfix\">\r\n        <span class=\"specification-name\">[ {{=specificationName}} ]</span>&nbsp;&nbsp;x {{=count}}\r\n    </div>\r\n</li>";
 
 },{}],39:[function(require,module,exports){
-module.exports = "<div class=\"user_center\">\r\n    <h1 class=\"user_face\"><img src=\"{{=avatar}}\"></h1>\r\n    <h2 class=\"user_nicheng\">{{=username}}</h2>\r\n</div>\r\n<div class=\"top2 clearfix\">\r\n    <!--<h2 class=\"top2_titleimg\"><img src=\"images/btn_person.png\" width=\"65\" height=\"65\"></h2>-->\r\n    <ul class=\"top2_list\">\r\n        <li><a href=\"#personal-info\"><p><img src=\"images/btn_person.png\" width=\"65\" height=\"65\"></p><p>个人信息</p></a></li>\r\n        <li class=\"top2_listli2\"><a href=\"#my-orders\"><p><img src=\"images/btn_dingdan.png\" width=\"65\" height=\"65\"></p><p>我的订单</p></a></li>\r\n        <li><a href=\"#shopping-cart\"><p><img src=\"images/btn_gwc.png\" width=\"65\" height=\"65\"></p><p>购物车</p></a></li>\r\n    </ul>\r\n</div>";
+module.exports = "<div class=\"success-main w\">\r\n    <div class=\"blank20\"></div>\r\n    <p class=\"ok\"></p>\r\n    <p class=\"noCar_info\">订单提交成功！</p>\r\n</div>";
 
 },{}],40:[function(require,module,exports){
-module.exports = "<div class=\"top2 clearfix\">\r\n    <h2 class=\"top2_titleimg\"><img src=\"{{=avatar}}\" width=\"65\" height=\"65\"></h2>\r\n</div>\r\n<h1 class=\"top_title\">个人信息</h1>\r\n\r\n<div class=\"w\">\r\n    <div class=\"user_xinxi\">\r\n        <ul class=\"user_xinxi_item clearfix\">\r\n            <li>会员编号：</li>\r\n            <li>{{=userNumber}}</li>\r\n        </ul>\r\n        <ul class=\"user_xinxi_item clearfix\">\r\n            <li>姓名：</li>\r\n            <li>{{=personalInfo.realName || username}}</li>\r\n        </ul>\r\n        <ul class=\"user_xinxi_item clearfix\">\r\n            <li>手机号：</li>\r\n            <li>{{=tel}}</li>\r\n        </ul>\r\n        <ul class=\"user_xinxi_item clearfix\">\r\n            <li>出生日期：</li>\r\n            <li>{{=personalInfo.birthday || \"未知\"}}</li>\r\n        </ul>\r\n    </div>\r\n</div>";
+module.exports = "<h2 class=\"order-title\">订单号：<a href=\"#order/{{=id}}\" class=\"order-number\">{{=orderNumber}}</a></h2>\r\n<p class=\"order-amount\">共 {{=amountCount}} 件商品，总计：<b class=\"amount-price\">￥{{=amountPrice}}</b></p>\r\n<div class=\"order-operation\">\r\n    <div class=\"user_dd_rbot clearfix\">\r\n    {{\r\n        if (status === 98) {\r\n    }}\r\n        {{\r\n            if (payment === 0) {\r\n        }}\r\n            <a class=\"btn_ddfk tobe-pay\">去付款</a>\r\n        {{\r\n            } else {\r\n        }}\r\n            <a class=\"btn_ddfk cash-on-delivery\">货到付款</a>\r\n        {{\r\n            }\r\n        }}\r\n        <a class=\"btn_ddfk cancel\">取消订单</a>\r\n    {{\r\n        } else if (status === 1) {\r\n    }}\r\n        <a class=\"btn_ddfk canceled\">已取消</a>\r\n    {{\r\n        } else if (status === 2) {\r\n    }}\r\n        <a class=\"btn_ddfk tobe-delivery\">等待发货</a>\r\n    {{\r\n        } else if (status === 3) {\r\n    }}\r\n        <a class=\"btn_ddfk accepted\">已接单</a>\r\n    {{\r\n        } else if (status === 4) {\r\n    }}\r\n        <a class=\"btn_ddfk charge-back\">退单中</a>\r\n    {{\r\n        } else if (status === 5) {\r\n    }}\r\n        <a class=\"btn_ddfk tobe-receipt\">等待收获</a>\r\n    {{\r\n        } else if (status === 6) {\r\n    }}\r\n        <a class=\"btn_ddfk rejected\">已拒绝</a>\r\n    {{\r\n        } else if (status === 99) {\r\n    }}\r\n        <a class=\"btn_ddfk paid\">已支付</a>\r\n    {{\r\n        }\r\n    }}\r\n    </div>\r\n</div>";
 
 },{}],41:[function(require,module,exports){
-module.exports = "<div class=\"w\">\r\n    <div class=\"good_box1\">\r\n        <h1 class=\"good_tit\"><span>{{=product.name}}</span></h1>\r\n        <p class=\"goog_jg\">商城价格：<i>￥{{=product.chooseSpecIndex >= 0 ? chooseSpec.price : product.price}}</i></p>\r\n        {{\r\n            if (chooseSpec.transportationCost > 0) {\r\n        }}\r\n            <p class=\"good_yf\">运费：￥{{=chooseSpec.transportationCost}}</p>\r\n        {{\r\n            } else {\r\n        }}\r\n            <p class=\"good_yf\">无运费</p>\r\n        {{\r\n            }\r\n        }}\r\n    </div>\r\n</div>\r\n<div class=\"w_good clearfix\">\r\n    <div class=\"w\">\r\n        <ul class=\"good_ggchioce clearfix\">\r\n            {{\r\n                for (var i in product.specifications) {\r\n            }}\r\n                    <li class=\"choose\">{{=product.specifications[i].name}}</li>\r\n            {{\r\n                }\r\n            }}\r\n        </ul>\r\n    </div>\r\n</div>\r\n<div class=\"w_good clearfix\">\r\n    <div class=\"w\">\r\n        <div class=\"good_num clearfix\">\r\n            <span class=\"good_ltitle\">数量：</span>\r\n            <a class=\"decrease\" href=\"javascript:;\">-</a>\r\n            <input type=\"text\" value=\"1\" id=\"prosum\">\r\n            <a class=\"increase\" href=\"javascript:;\">+</a>\r\n            <span class=\"good_yh\">{{=product.chooseSpecIndex < 0 || chooseSpec.inventoryCount > 0 ? '有货' : '缺货'}}</span>\r\n        </div>\r\n    </div>\r\n</div>\r\n<div class=\"w_good clearfix\">\r\n    <div class=\"w\">\r\n        <ul class=\"good_buy clearfix\">\r\n            <li><a class=\"good_btn_go\" href=\"javascript:void(0);\">加入购物车</a></li>\r\n            <li><a class=\"good_btn_buy\" href=\"javascript:void(0);\">立即购买</a></li>\r\n        </ul>\r\n    </div>\r\n</div>";
+module.exports = "<div class=\"user_center\">\r\n    <h1 class=\"user_face\"><img src=\"{{=avatar}}\"></h1>\r\n    <h2 class=\"user_nicheng\">{{=username}}</h2>\r\n</div>\r\n<div class=\"top2 clearfix\">\r\n    <!--<h2 class=\"top2_titleimg\"><img src=\"images/btn_person.png\" width=\"65\" height=\"65\"></h2>-->\r\n    <ul class=\"top2_list\">\r\n        <li><a href=\"#personal-center/personal-info\"><p><img src=\"images/btn_person.png\" width=\"65\" height=\"65\"></p><p>个人信息</p></a></li>\r\n        <li class=\"top2_listli2\"><a href=\"#personal-center/my-orders\"><p><img src=\"images/btn_dingdan.png\" width=\"65\" height=\"65\"></p><p>我的订单</p></a></li>\r\n        <li><a href=\"#shopping-cart\"><p><img src=\"images/btn_gwc.png\" width=\"65\" height=\"65\"></p><p>购物车</p></a></li>\r\n    </ul>\r\n</div>";
 
 },{}],42:[function(require,module,exports){
-module.exports = "<div class=\"good_pic\">\r\n    <div id=\"{{=sliderId}}\" class=\"slideBox_good\">\r\n        <div class=\"bd\">\r\n            <ul>\r\n            {{\r\n                for (var i in product.previewImagesJson) {\r\n            }}\r\n                <li><img src=\"{{=product.previewImagesJson[i]}}\" /></li>\r\n            {{\r\n                }\r\n            }}\r\n            </ul>\r\n        </div>\r\n        <div class=\"hd\"><ul></ul></div>\r\n    </div>\r\n</div>\r\n{{\r\n    var specNames = '';\r\n    for (var i in product.specifications) {\r\n        specNames += product.specifications[i].name + '  ';\r\n    }\r\n}}\r\n<div class=\"spec-detail w\">\r\n    <div class=\"good_tab\">\r\n        <ul id=\"myTab0\" class=\"good_tabT clearfix\">\r\n            <li class=\"active btn-spec\">规格参数</li>\r\n            <li class=\"normal btn-images\">商品图片</li>\r\n        </ul>\r\n    </div>\r\n    <div id=\"myTab0_Content0\" class=\"tab-spec good_cs\">\r\n        <div class=\"good_cont\">\r\n            ·品牌：{{=product.brand}}<br>\r\n            ·产品名称：{{=product.name}}<br>\r\n            ·适用年龄：6-12个月<br>\r\n            ·规格：{{=specNames}}<br>\r\n            {{=product.desc}}\r\n        </div>\r\n    </div>\r\n    <div id=\"myTab0_Content1\" class=\"tab-images good_cs none\">\r\n        <div class=\"good_cont\">\r\n        {{\r\n            for (var i in product.detailImagesJson) {\r\n        }}\r\n            <p><img data-src=\"{{=product.detailImagesJson[i]}}\" /></p>\r\n        {{\r\n            }\r\n        }}\r\n            <p>\r\n                ·品牌：{{=product.brand}}<br>\r\n                ·产品名称：{{=product.name}}<br>\r\n                ·适用年龄：6-12个月<br>\r\n                ·规格：{{=specNames}}<br>\r\n                {{=product.desc}}\r\n            </p>\r\n        </div>\r\n    </div>\r\n</div>";
+module.exports = "<div class=\"top2 clearfix\">\r\n    <h2 class=\"top2_titleimg\"><img src=\"{{=avatar}}\" width=\"65\" height=\"65\"></h2>\r\n</div>\r\n<h1 class=\"top_title\">个人信息</h1>\r\n\r\n<div class=\"w\">\r\n    <div class=\"user_xinxi\">\r\n        <ul class=\"user_xinxi_item clearfix\">\r\n            <li>会员编号：</li>\r\n            <li>{{=userNumber}}</li>\r\n        </ul>\r\n        <ul class=\"user_xinxi_item clearfix\">\r\n            <li>姓名：</li>\r\n            <li>{{=personalInfo.realName || username}}</li>\r\n        </ul>\r\n        <ul class=\"user_xinxi_item clearfix\">\r\n            <li>手机号：</li>\r\n            <li>{{=tel}}</li>\r\n        </ul>\r\n        <ul class=\"user_xinxi_item clearfix\">\r\n            <li>出生日期：</li>\r\n            <li>{{=personalInfo.birthday || \"未知\"}}</li>\r\n        </ul>\r\n    </div>\r\n</div>";
 
 },{}],43:[function(require,module,exports){
-module.exports = "<dl class=\"p_list\">\r\n    <dt>\r\n        <a href=\"#product/{{=id}}\">\r\n            <img src=\"{{=previewImagesJson && previewImagesJson.length > 0 ? previewImagesJson[0] : ''}}\">\r\n        </a>\r\n    </dt>\r\n    <dd>\r\n        <p class=\"p_title\"><a href=\"#product/{{=id}}\">{{=name}}</a></p>\r\n        <p class=\"p_price\">￥{{=price}}</p>\r\n    </dd>\r\n</dl>";
+module.exports = "<div class=\"w\">\r\n    <div class=\"good_box1\">\r\n        <h1 class=\"good_tit\"><span>{{=product.name}}</span></h1>\r\n        <p class=\"goog_jg\">商城价格：<i>￥{{=product.chooseSpecIndex >= 0 ? chooseSpec.price : product.price}}</i></p>\r\n        {{\r\n            if (typeof chooseSpec.transportationCost !== 'undefined') {\r\n        }}\r\n            <p class=\"good_yf\">{{=chooseSpec.transportationCost > 0 ? '运费：￥' + chooseSpec.transportationCost : '免运费'}}</p>\r\n        {{\r\n            } else {\r\n        }}\r\n            <p class=\"good_yf\">{{=product.transportationCost > 0 ? '运费：￥' + product.transportationCost : '免运费'}}</p>\r\n        {{\r\n            }\r\n        }}\r\n    </div>\r\n</div>\r\n<div class=\"w_good clearfix\">\r\n    <div class=\"w\">\r\n        <ul class=\"good_ggchioce clearfix\">\r\n            {{\r\n                for (var i in product.specifications) {\r\n            }}\r\n                    <li class=\"choose\">{{=product.specifications[i].name}}</li>\r\n            {{\r\n                }\r\n            }}\r\n        </ul>\r\n    </div>\r\n</div>\r\n<div class=\"w_good clearfix\">\r\n    <div class=\"w\">\r\n        <div class=\"good_num clearfix\">\r\n            <span class=\"good_ltitle\">数量：</span>\r\n            <a class=\"decrease\" href=\"javascript:;\">-</a>\r\n            <input type=\"text\" value=\"1\" id=\"prosum\">\r\n            <a class=\"increase\" href=\"javascript:;\">+</a>\r\n            <span class=\"good_yh\">{{=product.chooseSpecIndex < 0 || chooseSpec.inventoryCount > 0 ? '有货' : '缺货'}}</span>\r\n        </div>\r\n    </div>\r\n</div>\r\n<div class=\"w_good clearfix\">\r\n    <div class=\"w\">\r\n        <ul class=\"good_buy clearfix\">\r\n            <li><a class=\"good_btn_go\" href=\"javascript:void(0);\">加入购物车</a></li>\r\n            <li><a class=\"good_btn_buy\" href=\"javascript:void(0);\">立即购买</a></li>\r\n        </ul>\r\n    </div>\r\n</div>";
 
 },{}],44:[function(require,module,exports){
-module.exports = "<div class=\"search_top\">\r\n    <div class=\"w\">\r\n        <div class=\"search_top_bd\">\r\n            <ul>\r\n                <li><input name=\"\" type=\"text\" class=\"input_serch\" value=\"请输入商品关键字\" onfocus=\"if(this.value=='请输入商品关键字'){this.value='';}\"  onblur=\"if(this.value==''){this.value='请输入商品关键字';}\"></li>\r\n                <li><button name=\"\" type=\"button\" class=\"btn_so\"><i><img src=\"images/navimg4.png\"></i></button></li>\r\n            </ul>\r\n        </div>\r\n    </div>\r\n</div>\r\n<div class=\"search_list\">\r\n    <p><a href=\"#\">优博剖宫产 1段</a></p>\r\n    <p><a href=\"#\">优博58 2段</a></p>\r\n    <p><a href=\"#\">有机优博</a></p>\r\n</div>\r\n<div class=\"search_tit\"><h2>历史搜索记录</h2><div class=\"search_tm2\"></div></div>\r\n\r\n<div class=\"clear\"></div>\r\n<div class=\"blank20\"></div>\r\n<div class=\"search_tit\"><h2>宝贝推荐</h2><div class=\"search_tm\"></div></div>\r\n<div class=\"clear\"></div>\r\n<div class=\"blank10\"></div>\r\n<div class=\"w\">\r\n    <div class=\"w_bd\">\r\n        <div class=\"p_item\">\r\n            <dl class=\"p_list\">\r\n                <dt><a href=\"#\"><img src=\"images/p1.jpg\"></a></dt>\r\n                <dd>\r\n                    <p class=\"p_title\"><a href=\"#\">圣元优博58 2段婴幼儿奶粉</a></p>\r\n                    <p class=\"p_price\">￥288</p>\r\n                </dd>\r\n            </dl>\r\n        </div>\r\n        <div class=\"p_item\">\r\n            <dl class=\"p_list\">\r\n                <dt><img src=\"images/p1.jpg\"></dt>\r\n                <dd>\r\n                    <p class=\"p_title\"><a href=\"#\">优博剖宫产 1段婴幼儿配方奶粉</a></p>\r\n                    <p class=\"p_price\">￥268</p>\r\n                </dd>\r\n            </dl>\r\n        </div>\r\n\r\n    </div>\r\n</div>";
+module.exports = "<div class=\"good_pic\">\r\n    <div id=\"{{=sliderId}}\" class=\"slideBox_good\">\r\n        <div class=\"bd\">\r\n            <ul>\r\n            {{\r\n                for (var i in product.previewImagesJson) {\r\n            }}\r\n                <li><img src=\"{{=product.previewImagesJson[i]}}\" /></li>\r\n            {{\r\n                }\r\n            }}\r\n            </ul>\r\n        </div>\r\n        <div class=\"hd\"><ul></ul></div>\r\n    </div>\r\n</div>\r\n{{\r\n    var specNames = '';\r\n    for (var i in product.specifications) {\r\n        specNames += product.specifications[i].name + '  ';\r\n    }\r\n}}\r\n<div class=\"spec-detail w\">\r\n    <div class=\"good_tab\">\r\n        <ul id=\"myTab0\" class=\"good_tabT clearfix\">\r\n            <li class=\"active btn-spec\">规格参数</li>\r\n            <li class=\"normal btn-images\">商品图片</li>\r\n        </ul>\r\n    </div>\r\n    <div id=\"myTab0_Content0\" class=\"tab-spec good_cs\">\r\n        <div class=\"good_cont\">\r\n            ·品牌：{{=product.brand}}<br>\r\n            ·产品名称：{{=product.name}}<br>\r\n            ·适用年龄：6-12个月<br>\r\n            ·规格：{{=specNames}}<br>\r\n            {{=product.desc}}\r\n        </div>\r\n    </div>\r\n    <div id=\"myTab0_Content1\" class=\"tab-images good_cs none\">\r\n        <div class=\"good_cont\">\r\n        {{\r\n            for (var i in product.detailImagesJson) {\r\n        }}\r\n            <p><img data-src=\"{{=product.detailImagesJson[i]}}\" /></p>\r\n        {{\r\n            }\r\n        }}\r\n            <p>\r\n                ·品牌：{{=product.brand}}<br>\r\n                ·产品名称：{{=product.name}}<br>\r\n                ·适用年龄：6-12个月<br>\r\n                ·规格：{{=specNames}}<br>\r\n                {{=product.desc}}\r\n            </p>\r\n        </div>\r\n    </div>\r\n</div>";
 
 },{}],45:[function(require,module,exports){
-module.exports = "<li class=\"gwc_item_sel\"><a href=\"javascript:;\" class=\"select-item dx_sel\"></a></li>\r\n<li class=\"gwc_itme_bd\">\r\n    <div class=\"fl gwc_img\"><a href=\"#product/{{=productId}}\"><img src=\"{{=productPreviewImage}}\"></a></div>\r\n    <div class=\"fl gwc_rinfo\">\r\n        <div class=\"gwc_rinfo_top\">\r\n            <p class=\"p_title\"><a href=\"#product/{{=productId}}\">{{=productName}}</a></p>\r\n            <p class=\"p_price\">￥{{=price}} <span class=\"specification-name\">[ {{=specificationName}} ]</span>\r\n            </p>\r\n        </div>\r\n        <div class=\"good_num clearfix\">\r\n            <a class=\"decrease\" href=\"javascript:;\">-</a>\r\n            <input type=\"text\" value=\"{{=count}}\">\r\n            <a class=\"increase\" href=\"javascript:;\">+</a>\r\n        </div>\r\n    </div>\r\n</li>";
+module.exports = "<dl class=\"p_list\">\r\n    <dt>\r\n        <a href=\"#product/{{=id}}\">\r\n            <img src=\"{{=previewImagesJson && previewImagesJson.length > 0 ? previewImagesJson[0] : ''}}\">\r\n        </a>\r\n    </dt>\r\n    <dd>\r\n        <p class=\"p_title\"><a href=\"#product/{{=id}}\">{{=name}}</a></p>\r\n        <p class=\"p_price\">￥{{=price}}</p>\r\n    </dd>\r\n</dl>";
 
 },{}],46:[function(require,module,exports){
-module.exports = "<div class=\"gwc_main clearfix\">\r\n</div>\r\n<div class=\"clear\"></div>\r\n<div class=\"gwc_zj\">\r\n    <ul>\r\n        <li class=\"fl\"><a href=\"javascript:;\" class=\"select-all fl dx_sel\"></a><span class=\"fl\">&nbsp;全选</span></li>\r\n        <li class=\"fl\">\r\n            <p class=\"gwc_hj\">合计：￥<span>{{=checkedPrice}}</span></p>\r\n            <p class=\"gwc_amount\">总额：￥<span>{{=amountPrice}}</span></p>\r\n        </li>\r\n        <li class=\"fr\"><a class=\"create-order-btn\" href=\"javascript:;\">下订单</a></li>\r\n    </ul>\r\n</div>";
+module.exports = "<div class=\"search_top\">\r\n    <div class=\"w\">\r\n        <div class=\"search_top_bd\">\r\n            <ul>\r\n                <li><input name=\"\" type=\"text\" class=\"input_serch\" value=\"请输入商品关键字\" onfocus=\"if(this.value=='请输入商品关键字'){this.value='';}\"  onblur=\"if(this.value==''){this.value='请输入商品关键字';}\"></li>\r\n                <li><button name=\"\" type=\"button\" class=\"btn_so\"><i><img src=\"images/navimg4.png\"></i></button></li>\r\n            </ul>\r\n        </div>\r\n    </div>\r\n</div>\r\n<div class=\"search_list\">\r\n    <p><a href=\"#\">优博剖宫产 1段</a></p>\r\n    <p><a href=\"#\">优博58 2段</a></p>\r\n    <p><a href=\"#\">有机优博</a></p>\r\n</div>\r\n<div class=\"search_tit\"><h2>历史搜索记录</h2><div class=\"search_tm2\"></div></div>\r\n\r\n<div class=\"clear\"></div>\r\n<div class=\"blank20\"></div>\r\n<div class=\"search_tit\"><h2>宝贝推荐</h2><div class=\"search_tm\"></div></div>\r\n<div class=\"clear\"></div>\r\n<div class=\"blank10\"></div>\r\n<div class=\"w\">\r\n    <div class=\"w_bd\">\r\n        <div class=\"p_item\">\r\n            <dl class=\"p_list\">\r\n                <dt><a href=\"#\"><img src=\"images/p1.jpg\"></a></dt>\r\n                <dd>\r\n                    <p class=\"p_title\"><a href=\"#\">圣元优博58 2段婴幼儿奶粉</a></p>\r\n                    <p class=\"p_price\">￥288</p>\r\n                </dd>\r\n            </dl>\r\n        </div>\r\n        <div class=\"p_item\">\r\n            <dl class=\"p_list\">\r\n                <dt><img src=\"images/p1.jpg\"></dt>\r\n                <dd>\r\n                    <p class=\"p_title\"><a href=\"#\">优博剖宫产 1段婴幼儿配方奶粉</a></p>\r\n                    <p class=\"p_price\">￥268</p>\r\n                </dd>\r\n            </dl>\r\n        </div>\r\n\r\n    </div>\r\n</div>";
 
 },{}],47:[function(require,module,exports){
-module.exports = "<div class=\"top2 clearfix\">\r\n    <!--<img src=\"images/top2_gwc.png\">-->\r\n    <h2 class=\"top2_titleimg\"><img src=\"images/btn_gwc.png\" width=\"65\" height=\"65\"></h2>\r\n</div>\r\n<h1 class=\"top_title\">购物车</h1>\r\n<div class=\"w shopping-cart-main-container\">\r\n    {{\r\n        if (typeof id === 'undefined' || !items || items.length <= 0) {\r\n    }}\r\n    <div class=\"clear\"></div>\r\n    <div class=\"blank20\"></div>\r\n    <p class=\"noCar\"></p>\r\n    <p class=\"noCar_info\">您的购物车内还没有任何商品</p>\r\n    {{\r\n        }\r\n    }}\r\n</div>";
+module.exports = "<li class=\"gwc_item_sel\"><a href=\"javascript:;\" class=\"select-item dx_sel\"></a></li>\r\n<li class=\"gwc_itme_bd\">\r\n    <div class=\"fl gwc_img\"><a href=\"#product/{{=productId}}\"><img src=\"{{=productPreviewImage}}\"></a></div>\r\n    <div class=\"fl gwc_rinfo\">\r\n        <div class=\"gwc_rinfo_top\">\r\n            <p class=\"p_title\"><a href=\"#product/{{=productId}}\">{{=productName}}</a></p>\r\n            <p class=\"p_price\">￥{{=price}} <span class=\"specification-name\">[ {{=specificationName}} ]</span>\r\n            </p>\r\n        </div>\r\n        <div class=\"good_num clearfix\">\r\n            <a class=\"decrease\" href=\"javascript:;\">-</a>\r\n            <input type=\"text\" value=\"{{=count}}\">\r\n            <a class=\"increase\" href=\"javascript:;\">+</a>\r\n        </div>\r\n    </div>\r\n</li>";
 
 },{}],48:[function(require,module,exports){
+module.exports = "<div class=\"gwc_main clearfix\">\r\n</div>\r\n<div class=\"clear\"></div>\r\n<div class=\"gwc_zj\">\r\n    <ul>\r\n        <li class=\"fl\"><a href=\"javascript:;\" class=\"select-all fl dx_sel\"></a><span class=\"fl\">&nbsp;全选</span></li>\r\n        <li class=\"fl\">\r\n            <p class=\"gwc_hj\">合计：￥<span>{{=checkedPrice}}</span></p>\r\n            <p class=\"gwc_amount\">总额：￥<span>{{=amountPrice}}</span></p>\r\n        </li>\r\n        <li class=\"fr\"><a class=\"create-order-btn\" href=\"javascript:;\">下订单</a></li>\r\n    </ul>\r\n</div>";
+
+},{}],49:[function(require,module,exports){
+module.exports = "<div class=\"top2 clearfix\">\r\n    <!--<img src=\"images/top2_gwc.png\">-->\r\n    <h2 class=\"top2_titleimg\"><img src=\"images/btn_gwc.png\" width=\"65\" height=\"65\"></h2>\r\n</div>\r\n<h1 class=\"top_title\">购物车</h1>\r\n<div class=\"w shopping-cart-main-container\">\r\n    {{\r\n        if (typeof id === 'undefined' || !items || items.length <= 0) {\r\n    }}\r\n    <div class=\"clear\"></div>\r\n    <div class=\"blank20\"></div>\r\n    <p class=\"noCar\"></p>\r\n    <p class=\"noCar_info\">您的购物车内还没有任何商品</p>\r\n    {{\r\n        }\r\n    }}\r\n</div>";
+
+},{}],50:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -1395,7 +1440,7 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../collections/ad-board":8,"../settings.json":26,"../templates/ad-board.tpl":27,"underscore":76}],49:[function(require,module,exports){
+},{"../base/view":7,"../collections/ad-board":8,"../settings.json":26,"../templates/ad-board.tpl":27,"underscore":80}],51:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -1420,7 +1465,7 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../templates/categoriy-lev1.tpl":28,"underscore":76}],50:[function(require,module,exports){
+},{"../base/view":7,"../templates/categoriy-lev1.tpl":28,"underscore":80}],52:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -1445,7 +1490,7 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../templates/footer-navbar.tpl":31,"underscore":76}],51:[function(require,module,exports){
+},{"../base/view":7,"../templates/footer-navbar.tpl":31,"underscore":80}],53:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -1475,7 +1520,7 @@ module.exports = View.extend({
     window.pollexmomApp.navigate("/generate-order/" + this.ids + "/delivery-address/" + (this.model ? this.model.id : 'null'), {trigger: true});
   }
 });
-},{"../base/view":7,"../templates/generate-order-delivery-info.tpl":32,"underscore":76}],52:[function(require,module,exports){
+},{"../base/view":7,"../templates/generate-order-delivery-info.tpl":32,"underscore":80}],54:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -1501,7 +1546,7 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../templates/generate-order-details-item.tpl":33,"underscore":76}],53:[function(require,module,exports){
+},{"../base/view":7,"../templates/generate-order-details-item.tpl":33,"underscore":80}],55:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -1542,7 +1587,7 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../templates/generate-order-details.tpl":34,"./generate-order-details-item":52,"underscore":76}],54:[function(require,module,exports){
+},{"../base/view":7,"../templates/generate-order-details.tpl":34,"./generate-order-details-item":54,"underscore":80}],56:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -1570,7 +1615,91 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../templates/header.tpl":36,"underscore":76}],55:[function(require,module,exports){
+},{"../base/view":7,"../templates/header.tpl":36,"underscore":80}],57:[function(require,module,exports){
+/**
+ * @Description:
+ * @Author: fuwensong
+ * @Date: 2015/5/9
+ * @Company: China EKai
+ * @Copyright: All rights Reserved, Designed By EKai
+ *               Copyright(C) 2005-2014
+ */
+var _ = require('underscore');
+var View = require('../base/view');
+var template = require('../templates/order-item.tpl');
+
+module.exports = View.extend({
+  role: 'list-item',
+  className: 'user_dd_item clearfix',
+  tagName: 'ul',
+  template: _.template(template),
+
+  initialize: function () {
+
+  },
+  render: function () {
+    this.$el.empty();
+    this.$el.html(this.template(this.model ? this.model.attributes : {}));
+    return this;
+  }
+});
+},{"../base/view":7,"../templates/order-item.tpl":38,"underscore":80}],58:[function(require,module,exports){
+/**
+ * @Description:
+ * @Author: fuwensong
+ * @Date: 2015/5/9
+ * @Company: China EKai
+ * @Copyright: All rights Reserved, Designed By EKai
+ *               Copyright(C) 2005-2014
+ */
+var $ = require('jquery');
+var _ = require('underscore');
+var View = require('../base/view');
+var template = require('../templates/order.tpl');
+var OrderItemView = require('../views/order-item');
+var OrderItemModel = require('../models/order-item');
+
+module.exports = View.extend({
+  className: 'user-order',
+  template: _.template(template),
+  events: {
+    'click .btn_ddfk.cancel': 'cancelOrder'
+  },
+  initialize: function () {
+
+  },
+  render: function () {
+    this.$el.empty();
+
+    var locals = _.extend({
+      amountCount: this.model.amountItemsCount(),
+      amountPrice: this.model.amountItemsPrice()
+    }, this.model.attributes);
+    this.$el.html(this.template(locals));
+
+    var items = this.model.get('items');
+    var $el = this.$el.find('.order-title');
+    _.each(items, function (item) {
+      $el.after(new OrderItemView({model: new OrderItemModel(item)}).render().el);
+    });
+    return this;
+  },
+  cancelOrder: function (e) {
+    // TODO add confirm dialog
+    var $el = $(e.currentTarget);
+    this.model.save({status: 1}, {
+      success: function (model) {
+        $el.siblings('.btn_ddfk').remove();
+        $el.removeClass('cancel').addClass('canceled').text('已取消');
+      },
+      error: function (model, err) {
+        alert('取消订单失败');
+        console.log('Cancel order error' + err);
+      }
+    });
+  }
+});
+},{"../base/view":7,"../models/order-item":18,"../templates/order.tpl":40,"../views/order-item":57,"jquery":79,"underscore":80}],59:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -1598,7 +1727,7 @@ module.exports = Page.extend({
     return this;
   }
 });
-},{"../base/page":4,"../templates/category.tpl":29,"./footer-navbar":50,"./header":54,"underscore":76}],56:[function(require,module,exports){
+},{"../base/page":4,"../templates/category.tpl":29,"./footer-navbar":52,"./header":56,"underscore":80}],60:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -1630,7 +1759,7 @@ module.exports = Page.extend({
     }
     this.ids = ids;
 
-    var itemId = options.id;
+    var itemId = options.addressId;
     var storedDeliveryAddress = localStorage.getItem(Settings.locals.userDeliveryAddress);
     var deliveryAddress = {
       userId: Settings.userId
@@ -1722,6 +1851,7 @@ module.exports = Page.extend({
     }
   },
   saveBtnEvent: function (e) {
+    var self = this;
     var ids = this.ids;
     var consigneeName = this.$el.find('input.consigneeName').val();
     var consigneeTel = this.$el.find('input.consigneeTel').val();
@@ -1752,6 +1882,8 @@ module.exports = Page.extend({
         detailAddress: detailAddress
       }, {
         success: function (model, err) {
+          self.insertOrUpdateCache(isEdit, model.toJSON());
+
           alert(isEdit ? '编辑成功' : '新增成功');
           window.pollexmomApp.navigate("/generate-order/" + ids, {trigger: true});
         },
@@ -1761,9 +1893,20 @@ module.exports = Page.extend({
         }
       });
     }
+  },
+  insertOrUpdateCache: function (isEdit, address) {
+    var storedAddress = JSON.parse(localStorage.getItem(Settings.locals.userDeliveryAddress));
+    storedAddress = storedAddress || [];
+
+    if (isEdit) {
+      _.extend(_.findWhere(storedAddress, {id: address.id}), address);
+    } else {
+      storedAddress.push[address];
+    }
+    localStorage.setItem(Settings.locals.userDeliveryAddress, JSON.stringify(storedAddress));
   }
 });
-},{"../base/page":4,"../delivery-addresses.json":14,"../models/delivery-address":16,"../settings.json":26,"../templates/edit-delivery-address.tpl":30,"./footer-navbar":50,"jquery":75,"underscore":76}],57:[function(require,module,exports){
+},{"../base/page":4,"../delivery-addresses.json":14,"../models/delivery-address":16,"../settings.json":26,"../templates/edit-delivery-address.tpl":30,"./footer-navbar":52,"jquery":79,"underscore":80}],61:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -1783,6 +1926,7 @@ var ShoppingCartModel = require('../models/shopping-cart');
 var ShoppingCartItemModel = require('../models/shopping-cart-item');
 var DeliveryInfoModel = require('../models/delivery-info');
 var DeliveryAddressCollection = require('../collections/delivery-address');
+var DeliveryAddressModel = require('../models/delivery-address');
 var OrderItemCollection = require('../collections/order-item');
 var OrderDeliveryInfoView = require('../views/generate-order-delivery-info');
 var OrderDetailsView = require('../views/generate-order-details');
@@ -1813,68 +1957,82 @@ module.exports = Page.extend({
     var self = this;
 
     this.on('deliveryAddressInfoReady', this.renderDeliveryAddressInfo);
-    async.parallel([
-      function fetchUserDeliveryInfo(callback){
-        var model = new DeliveryInfoModel({userId: Settings.userId});
 
-        model.url = model.userRelationUrl();
-        model.fetch({
-          success: function (model) {
-            callback(null, model);
-          },
-          error: function (model, err) {
-            if (err.status === 500) {
-              return callback(err, model);
-            }
+    var storedUserDeliveryInfo = JSON.parse(localStorage.getItem(Settings.locals.userDeliveryInfo));
+    var storedUserDeliveryAddress = JSON.parse(localStorage.getItem(Settings.locals.userDeliveryAddress));
+    var deliveryAddressInfo;
 
-            // not create delivery info before
-            model.url = model.userRelationUrl();
-            model.save(model.attributes, {
-              success: function (model) {
-                callback(null, model);
-              },
-              error: function (model, err) {
-                callback(err);
+    if (storedUserDeliveryInfo && storedUserDeliveryAddress && storedUserDeliveryAddress.length > 0) {
+      var defaultAddressId = storedUserDeliveryInfo.defaultAddressId;
+      deliveryAddressInfo = defaultAddressId
+        ? _.findWhere(storedUserDeliveryAddress,{id: defaultAddressId})
+        : storedUserDeliveryAddress[0];
+
+      this.trigger('deliveryAddressInfoReady', deliveryAddressInfo);
+    } else {
+
+      async.parallel([
+        function fetchUserDeliveryInfo(callback){
+          var model = new DeliveryInfoModel({userId: Settings.userId});
+
+          model.url = model.userRelationUrl();
+          model.fetch({
+            success: function (model) {
+              callback(null, model);
+            },
+            error: function (model, err) {
+              if (err.status === 500) {
+                return callback(err, model);
               }
-            });
 
-          }
-        });
-      },
-      function fetchUserDeliveryAddresses(callback) {
-        var collection = new DeliveryAddressCollection();
+              // not create delivery info before
+              model.url = model.userRelationUrl();
+              model.save(model.attributes, {
+                success: function (model) {
+                  callback(null, model);
+                },
+                error: function (model, err) {
+                  callback(err);
+                }
+              });
 
-        collection.userId = Settings.userId;
-        collection.url = collection.userRelationUrl();
-        collection.fetch({
-          success: function (collection) {
-            callback(null, collection);
-          },
-          error: function (collection, err) {
-            callback(err);
-          }
-        });
-      }
-    ], function (err, results) {
-      if (err) {
-        alert('初始化收货信息失败!');
-        return console.error('Error: ' + err);
-      }
-      console.log('InitDeliveryAddressInfo success!' + results);
+            }
+          });
+        },
+        function fetchUserDeliveryAddresses(callback) {
+          var collection = new DeliveryAddressCollection();
 
-      var deliveryInfo = results[0];
-      var deliveryAddress = results[1];
-      var deliveryAddressInfo;
+          collection.userId = Settings.userId;
+          collection.url = collection.userRelationUrl();
+          collection.fetch({
+            success: function (collection) {
+              callback(null, collection);
+            },
+            error: function (collection, err) {
+              callback(err);
+            }
+          });
+        }
+      ], function (err, results) {
+        if (err) {
+          alert('初始化收货信息失败!');
+          return console.error('Error: ' + err);
+        }
+        console.log('InitDeliveryAddressInfo success!' + results);
 
-      if (deliveryInfo && deliveryAddress && deliveryAddress.length > 0) {
-        localStorage.setItem(Settings.locals.userDeliveryInfo, JSON.stringify(deliveryInfo.toJSON()));
-        localStorage.setItem(Settings.locals.userDeliveryAddress, JSON.stringify(deliveryAddress.toJSON()));
+        var deliveryInfo = results[0];
+        var deliveryAddress = results[1];
 
-        var defaultAddressId = deliveryInfo.get('defaultAddressId');
-        deliveryAddressInfo = defaultAddressId ? deliveryAddress.get(defaultAddressId) : deliveryAddress.at(0);
-      }
-      self.trigger('deliveryAddressInfoReady', deliveryAddressInfo);
-    });
+        if (deliveryInfo && deliveryAddress && deliveryAddress.length > 0) {
+          localStorage.setItem(Settings.locals.userDeliveryInfo, JSON.stringify(deliveryInfo.toJSON()));
+          localStorage.setItem(Settings.locals.userDeliveryAddress, JSON.stringify(deliveryAddress.toJSON()));
+
+          var defaultAddressId = deliveryInfo.get('defaultAddressId');
+          deliveryAddressInfo = defaultAddressId ? deliveryAddress.get(defaultAddressId) : deliveryAddress.at(0);
+        }
+        self.trigger('deliveryAddressInfoReady', deliveryAddressInfo.toJSON());
+      });
+    }
   },
   initOrderInfo: function () {
     var self = this;
@@ -1932,7 +2090,7 @@ module.exports = Page.extend({
   },
   renderDeliveryAddressInfo: function (deliveryAddressInfo) {
     var view = new OrderDeliveryInfoView({
-      model: deliveryAddressInfo,
+      model: new DeliveryAddressModel(deliveryAddressInfo),
       ids: this.ids
     });
     view.setElement(this.$el.find('.delivery-info'));
@@ -1985,7 +2143,7 @@ module.exports = Page.extend({
 
         var tasks = [];
         _.each(orderItems.models, function (model) {
-          model.set('orderId', model.id);
+          model.set('orderId', order.id);
 
           tasks.push(function (callback) {
             model.save(model.attributes, {
@@ -2030,7 +2188,7 @@ module.exports = Page.extend({
     });
   }
 });
-},{"../base/page":4,"../collections/delivery-address":9,"../collections/order-item":10,"../models/delivery-info":17,"../models/order":19,"../models/shopping-cart":23,"../models/shopping-cart-item":22,"../settings.json":26,"../templates/generate-order.tpl":35,"../views/generate-order-delivery-info":51,"../views/generate-order-details":53,"./footer-navbar":50,"async":71,"underscore":76}],58:[function(require,module,exports){
+},{"../base/page":4,"../collections/delivery-address":9,"../collections/order-item":10,"../models/delivery-address":16,"../models/delivery-info":17,"../models/order":19,"../models/shopping-cart":23,"../models/shopping-cart-item":22,"../settings.json":26,"../templates/generate-order.tpl":35,"../views/generate-order-delivery-info":53,"../views/generate-order-details":55,"./footer-navbar":52,"async":75,"underscore":80}],62:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -2061,7 +2219,7 @@ module.exports = Page.extend({
     return this;
   }
 });
-},{"../base/page":4,"./ad-board":48,"./first-level-cat":49,"./footer-navbar":50,"./header":54,"./product-list-index":68}],59:[function(require,module,exports){
+},{"../base/page":4,"./ad-board":50,"./first-level-cat":51,"./footer-navbar":52,"./header":56,"./product-list-index":72}],63:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -2077,11 +2235,18 @@ var template = require('../templates/my-orders.tpl');
 var FooterNavbarView = require('./footer-navbar');
 var Settings = require('../settings.json');
 var OrderCollection = require('../collections/order');
+var OrderView = require('./order');
 
 module.exports = Page.extend({
   id: 'my-orders-page',
   template: _.template(template),
-  initialize: function () {
+  events: {
+    'click .order-type-tab': 'orderTypeTabEvent' // change to hash change
+  },
+  initialize: function (options) {
+    options = options || {};
+    this.type = options.type;
+
     var allOrders = this.allOrders = new OrderCollection(); //所有
     var tobePaidOrders = this.tobePaidOrders = new OrderCollection(); //待支付
     var receiptOrders = this.receiptOrders = new OrderCollection(); //待收获
@@ -2099,36 +2264,39 @@ module.exports = Page.extend({
     localStorage.removeItem(Settings.locals.userTobePaidOrders);
     localStorage.removeItem(Settings.locals.userReceiptOrders);
     localStorage.removeItem(Settings.locals.userAllOrders);
-
-    this.prepareOrders('tobePaid');
   },
   render: function (model) {
     this.$el.empty();
     this.$el.html(this.template());
     this.$el.append(new FooterNavbarView().render().el);
+
+    this.prepareOrders(this.type || 'tobePaid');
     return this;
   },
   prepareOrders: function (type) {
     var self = this;
     var collection;
     var storedOrders;
+    var localKey;
 
     switch (type) {
       case 'tobePaid':
         collection = this.tobePaidOrders;
-        storedOrders = localStorage.getItem(Settings.locals.userTobePaidOrders);
+        localKey = Settings.locals.userTobePaidOrders;
         break;
       case 'all':
         collection = this.allOrders;
-        storedOrders = localStorage.getItem(Settings.locals.userAllOrders);
+        localKey = Settings.locals.userAllOrders;
         break;
       case 'receipt':
         collection = this.receiptOrders;
-        storedOrders = localStorage.getItem(Settings.locals.userReceiptOrders);
+        localKey = Settings.locals.userReceiptOrders;
         break;
       default:
         break;
     }
+
+    storedOrders = JSON.parse(localStorage.getItem(localKey));
 
     if (storedOrders && storedOrders.length > 0) {
       collection.reset(storedOrders);
@@ -2137,6 +2305,8 @@ module.exports = Page.extend({
       collection.fetch({
         success: function (collection) {
           self.renderOrders(collection, type);
+
+          localStorage.setItem(localKey, JSON.stringify(collection.toJSON()));
         },
         error: function (collection, err) {
           console.error('Fetch orders error: ' + err);
@@ -2147,16 +2317,35 @@ module.exports = Page.extend({
   },
   renderOrders: function (collection, type) {
     this.$el.find('.order-type-tab.active').removeClass('active');
-    this.$el.find('.order-type-tab.active').removeClass('active');
+    this.$el.find('.order-list.active').removeClass('active');
 
     this.$el.find('.order-type-tab[data-type="' + type + '"]').addClass('active');
 
-    if (collection) {
+    var $el = this.$el.find('.order-list[data-type="' + type + '"]');
+    $el.addClass('active').empty();
 
+    if (collection && collection.length > 0) {
+
+      _.each(collection.models, function (model) {
+        $el.append(new OrderView({model: model}).render().el);
+      })
+
+    } else {
+      $el.append('<p class="no-result">无订单记录！</p>');
+    }
+  },
+  orderTypeTabEvent: function (e) {
+    var $el = $(e.currentTarget);
+
+    if (!$el.hasClass('active')) {
+      var type = $el.attr('data-type');
+      this.prepareOrders(type);
+      return window.pollexmomApp.navigate("/personal-center/my-orders/" + type, {trigger: false});
     }
   }
 });
-},{"../base/page":4,"../collections/order":11,"../settings.json":26,"../templates/my-orders.tpl":37,"./footer-navbar":50,"jquery":75,"underscore":76}],60:[function(require,module,exports){
+
+},{"../base/page":4,"../collections/order":11,"../settings.json":26,"../templates/my-orders.tpl":37,"./footer-navbar":52,"./order":58,"jquery":79,"underscore":80}],64:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -2184,7 +2373,7 @@ module.exports = Page.extend({
     return this;
   }
 });
-},{"../base/page":4,"../templates/order-success.tpl":38,"./footer-navbar":50,"./header":54,"underscore":76}],61:[function(require,module,exports){
+},{"../base/page":4,"../templates/order-success.tpl":39,"./footer-navbar":52,"./header":56,"underscore":80}],65:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -2220,7 +2409,7 @@ module.exports = Page.extend({
     return this;
   }
 });
-},{"../base/page":4,"../models/user":24,"../settings.json":26,"../templates/personal-center.tpl":39,"./footer-navbar":50,"underscore":76}],62:[function(require,module,exports){
+},{"../base/page":4,"../models/user":24,"../settings.json":26,"../templates/personal-center.tpl":41,"./footer-navbar":52,"underscore":80}],66:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -2256,7 +2445,7 @@ module.exports = Page.extend({
     return this;
   }
 });
-},{"../base/page":4,"../models/user":24,"../settings.json":26,"../templates/personal-info.tpl":40,"./footer-navbar":50,"underscore":76}],63:[function(require,module,exports){
+},{"../base/page":4,"../models/user":24,"../settings.json":26,"../templates/personal-info.tpl":42,"./footer-navbar":52,"underscore":80}],67:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -2337,7 +2526,7 @@ module.exports = Page.extend({
 
   }
 });
-},{"../base/page":4,"../templates/product-detail.tpl":42,"./footer-navbar":50,"./product-detail-spec":66,"jquery":75,"underscore":76}],64:[function(require,module,exports){
+},{"../base/page":4,"../templates/product-detail.tpl":44,"./footer-navbar":52,"./product-detail-spec":70,"jquery":79,"underscore":80}],68:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -2364,7 +2553,7 @@ module.exports = Page.extend({
     return this;
   }
 });
-},{"../base/page":4,"../templates/search.tpl":44,"./footer-navbar":50,"underscore":76}],65:[function(require,module,exports){
+},{"../base/page":4,"../templates/search.tpl":46,"./footer-navbar":52,"underscore":80}],69:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -2430,7 +2619,7 @@ module.exports = Page.extend({
     return this;
   }
 });
-},{"../base/page":4,"../models/shopping-cart":23,"../settings.json":26,"../templates/shopping-cart.tpl":47,"../views/shopping-cart-list":70,"./footer-navbar":50,"underscore":76}],66:[function(require,module,exports){
+},{"../base/page":4,"../models/shopping-cart":23,"../settings.json":26,"../templates/shopping-cart.tpl":49,"../views/shopping-cart-list":74,"./footer-navbar":52,"underscore":80}],70:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -2506,6 +2695,7 @@ module.exports = View.extend({
     this.setPurchaseNum(e, true);
   },
   addIntoShoppingCartEvent: function (e, success, error) {
+    var self = this;
     var chooseSpecIndex = this.model.get('chooseSpecIndex');
     var chooseSpecModel = this.model.get('chooseSpecModel');
     var selected = chooseSpecIndex >= 0 && chooseSpecModel.id && !_.isEmpty(chooseSpecModel.attributes);
@@ -2561,6 +2751,8 @@ module.exports = View.extend({
             success(model.attributes);
             console.log('Added into shopping cart success!', model);
             localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(storedShoppingCart));
+
+            self.resetProductStatus();
           },
           error: function (model, err) {
             console.error('Error: ' + err);
@@ -2644,6 +2836,8 @@ module.exports = View.extend({
           }
           localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(shoppingCart.toJSON()));
           success(model.attributes);
+
+          self.resetProductStatus();
         });
 
       }
@@ -2651,13 +2845,24 @@ module.exports = View.extend({
   },
   goToOrderEvent: function (e) {
     this.addIntoShoppingCartEvent(e, function(item) {
+      var storedShoppingCart = JSON.parse(localStorage.getItem(Settings.locals.userShoppingCart));
+
+      if (storedShoppingCart) {
+        storedShoppingCart.items.push[item];
+        localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(storedShoppingCart));
+      }
+
       window.pollexmomApp.navigate("/generate-order/" + item.id, {trigger: true});
     }, function () {
       alert('下单失败！');
     })
+  },
+  resetProductStatus: function () {
+    this.model.set('chooseSpecIndex', 0);
+    this.$el.find('.good_num>input').val(1);
   }
 });
-},{"../base/view":7,"../models/shopping-cart":23,"../models/shopping-cart-item":22,"../settings.json":26,"../templates/product-detail-spec.tpl":41,"async":71,"jquery":75,"underscore":76}],67:[function(require,module,exports){
+},{"../base/view":7,"../models/shopping-cart":23,"../models/shopping-cart-item":22,"../settings.json":26,"../templates/product-detail-spec.tpl":43,"async":75,"jquery":79,"underscore":80}],71:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -2684,7 +2889,7 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../templates/product-item.tpl":43,"underscore":76}],68:[function(require,module,exports){
+},{"../base/view":7,"../templates/product-item.tpl":45,"underscore":80}],72:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -2721,7 +2926,7 @@ module.exports = View.extend({
     return this;
   }
 });
-},{"../base/view":7,"../collections/product":12,"../settings.json":26,"./product-item":67,"underscore":76}],69:[function(require,module,exports){
+},{"../base/view":7,"../collections/product":12,"../settings.json":26,"./product-item":71,"underscore":80}],73:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -2786,7 +2991,7 @@ module.exports = View.extend({
     }
   }
 });
-},{"../base/view":7,"../templates/shopping-cart-item.tpl":45,"jquery":75,"underscore":76}],70:[function(require,module,exports){
+},{"../base/view":7,"../templates/shopping-cart-item.tpl":47,"jquery":79,"underscore":80}],74:[function(require,module,exports){
 /**
  * @Description:
  * @Author: fuwensong
@@ -2904,7 +3109,7 @@ module.exports = View.extend({
     }
   }
 });
-},{"../base/view":7,"../collections/shopping-cart-item":13,"../settings.json":26,"../templates/shopping-cart-items.tpl":46,"./shopping-cart-item":69,"underscore":76}],71:[function(require,module,exports){
+},{"../base/view":7,"../collections/shopping-cart-item":13,"../settings.json":26,"../templates/shopping-cart-items.tpl":48,"./shopping-cart-item":73,"underscore":80}],75:[function(require,module,exports){
 (function (process){
 /*!
  * async
@@ -4031,7 +4236,7 @@ module.exports = View.extend({
 }());
 
 }).call(this,require('_process'))
-},{"_process":74}],72:[function(require,module,exports){
+},{"_process":78}],76:[function(require,module,exports){
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -5641,7 +5846,7 @@ module.exports = View.extend({
 
 }));
 
-},{"underscore":73}],73:[function(require,module,exports){
+},{"underscore":77}],77:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -7191,7 +7396,7 @@ module.exports = View.extend({
   }
 }.call(this));
 
-},{}],74:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -7283,7 +7488,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],75:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.4
  * http://jquery.com/
@@ -16495,6 +16700,6 @@ return jQuery;
 
 }));
 
-},{}],76:[function(require,module,exports){
-arguments[4][73][0].apply(exports,arguments)
-},{"dup":73}]},{},[1]);
+},{}],80:[function(require,module,exports){
+arguments[4][77][0].apply(exports,arguments)
+},{"dup":77}]},{},[1]);

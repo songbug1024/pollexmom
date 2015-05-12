@@ -23,14 +23,18 @@ module.exports = Collection.extend({
     return this.baseUrl + 'users/' + userId + '/orders';
   },
   allUrl: function () {
-    var queryString = this.qIncludes({items: ''}).qLimit(Settings.pageSize).qEnd();
+    var queryString = this.qIncludes({items: ''})
+      .qLimit(Settings.pageSize)
+      .qOrder({id: 'DESC'})
+      .qEnd();
 
     return this.userRelationUrl() + '?' + queryString;
   },
   tobePaidUrl: function () {
     var queryString = this.qIncludes({items: ''})
       .qLimit(Settings.pageSize)
-      .qWhere({status: 0}) // 待支付
+      .qWhere({status: 98}) // 待支付
+      .qOrder({id: 'DESC'})
       .qEnd();
 
     return this.userRelationUrl() + '?' + queryString;
@@ -38,7 +42,8 @@ module.exports = Collection.extend({
   receiptUrl: function () {
     var queryString = this.qIncludes({items: ''})
       .qLimit(Settings.pageSize)
-      .qWhere({status: 3}) // 待收货
+      .qWhere({status: 5}) // 待收货
+      .qOrder({id: 'DESC'})
       .qEnd();
 
     return this.userRelationUrl() + '?' + queryString;

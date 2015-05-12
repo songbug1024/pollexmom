@@ -13,11 +13,18 @@ var template = require('../templates/my-orders.tpl');
 var FooterNavbarView = require('./footer-navbar');
 var Settings = require('../settings.json');
 var OrderCollection = require('../collections/order');
+var OrderView = require('./order');
 
 module.exports = Page.extend({
   id: 'my-orders-page',
   template: _.template(template),
-  initialize: function () {
+  events: {
+    'click .order-type-tab': 'orderTypeTabEvent' // change to hash change
+  },
+  initialize: function (options) {
+    options = options || {};
+    this.type = options.type;
+
     var allOrders = this.allOrders = new OrderCollection(); //所有
     var tobePaidOrders = this.tobePaidOrders = new OrderCollection(); //待支付
     var receiptOrders = this.receiptOrders = new OrderCollection(); //待收获
@@ -35,13 +42,13 @@ module.exports = Page.extend({
     localStorage.removeItem(Settings.locals.userTobePaidOrders);
     localStorage.removeItem(Settings.locals.userReceiptOrders);
     localStorage.removeItem(Settings.locals.userAllOrders);
-
-    this.prepareOrders('tobePaid');
   },
   render: function (model) {
     this.$el.empty();
     this.$el.html(this.template());
     this.$el.append(new FooterNavbarView().render().el);
+
+    this.prepareOrders(this.type || 'tobePaid');
     return this;
   },
   prepareOrders: function (type) {
@@ -67,7 +74,7 @@ module.exports = Page.extend({
         break;
     }
 
-    storedOrders = localStorage.getItem(localKey);
+    storedOrders = JSON.parse(localStorage.getItem(localKey));
 
     if (storedOrders && storedOrders.length > 0) {
       collection.reset(storedOrders);
@@ -77,7 +84,7 @@ module.exports = Page.extend({
         success: function (collection) {
           self.renderOrders(collection, type);
 
-          localStorage.setItem(localKey, collection.toJSON());
+          localStorage.setItem(localKey, JSON.stringify(collection.toJSON()));
         },
         error: function (collection, err) {
           console.error('Fetch orders error: ' + err);
@@ -91,10 +98,27 @@ module.exports = Page.extend({
     this.$el.find('.order-list.active').removeClass('active');
 
     this.$el.find('.order-type-tab[data-type="' + type + '"]').addClass('active');
-    this.$el.find('.order-list[data-type="' + type + '"]').addClass('active');
 
-    if (collection) {
+    var $el = this.$el.find('.order-list[data-type="' + type + '"]');
+    $el.addClass('active').empty();
 
+    if (collection && collection.length > 0) {
+
+      _.each(collection.models, function (model) {
+        $el.append(new OrderView({model: model}).render().el);
+      })
+
+    } else {
+      $el.append('<p class="no-result">无订单记录！</p>');
+    }
+  },
+  orderTypeTabEvent: function (e) {
+    var $el = $(e.currentTarget);
+
+    if (!$el.hasClass('active')) {
+      var type = $el.attr('data-type');
+      this.prepareOrders(type);
+      return window.pollexmomApp.navigate("/personal-center/my-orders/" + type, {trigger: false});
     }
   }
 });

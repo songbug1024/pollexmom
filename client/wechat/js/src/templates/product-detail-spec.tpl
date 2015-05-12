@@ -3,13 +3,13 @@
         <h1 class="good_tit"><span>{{=product.name}}</span></h1>
         <p class="goog_jg">商城价格：<i>￥{{=product.chooseSpecIndex >= 0 ? chooseSpec.price : product.price}}</i></p>
         {{
-            if (chooseSpec.transportationCost > 0) {
+            if (typeof chooseSpec.transportationCost !== 'undefined') {
         }}
-            <p class="good_yf">运费：￥{{=chooseSpec.transportationCost}}</p>
+            <p class="good_yf">{{=chooseSpec.transportationCost > 0 ? '运费：￥' + chooseSpec.transportationCost : '免运费'}}</p>
         {{
             } else {
         }}
-            <p class="good_yf">无运费</p>
+            <p class="good_yf">{{=product.transportationCost > 0 ? '运费：￥' + product.transportationCost : '免运费'}}</p>
         {{
             }
         }}

@@ -17,6 +17,7 @@ var ShoppingCartModel = require('../models/shopping-cart');
 var ShoppingCartItemModel = require('../models/shopping-cart-item');
 var DeliveryInfoModel = require('../models/delivery-info');
 var DeliveryAddressCollection = require('../collections/delivery-address');
+var DeliveryAddressModel = require('../models/delivery-address');
 var OrderItemCollection = require('../collections/order-item');
 var OrderDeliveryInfoView = require('../views/generate-order-delivery-info');
 var OrderDetailsView = require('../views/generate-order-details');
@@ -47,68 +48,82 @@ module.exports = Page.extend({
     var self = this;
 
     this.on('deliveryAddressInfoReady', this.renderDeliveryAddressInfo);
-    async.parallel([
-      function fetchUserDeliveryInfo(callback){
-        var model = new DeliveryInfoModel({userId: Settings.userId});
 
-        model.url = model.userRelationUrl();
-        model.fetch({
-          success: function (model) {
-            callback(null, model);
-          },
-          error: function (model, err) {
-            if (err.status === 500) {
-              return callback(err, model);
-            }
+    var storedUserDeliveryInfo = JSON.parse(localStorage.getItem(Settings.locals.userDeliveryInfo));
+    var storedUserDeliveryAddress = JSON.parse(localStorage.getItem(Settings.locals.userDeliveryAddress));
+    var deliveryAddressInfo;
 
-            // not create delivery info before
-            model.url = model.userRelationUrl();
-            model.save(model.attributes, {
-              success: function (model) {
-                callback(null, model);
-              },
-              error: function (model, err) {
-                callback(err);
+    if (storedUserDeliveryInfo && storedUserDeliveryAddress && storedUserDeliveryAddress.length > 0) {
+      var defaultAddressId = storedUserDeliveryInfo.defaultAddressId;
+      deliveryAddressInfo = defaultAddressId
+        ? _.findWhere(storedUserDeliveryAddress,{id: defaultAddressId})
+        : storedUserDeliveryAddress[0];
+
+      this.trigger('deliveryAddressInfoReady', deliveryAddressInfo);
+    } else {
+
+      async.parallel([
+        function fetchUserDeliveryInfo(callback){
+          var model = new DeliveryInfoModel({userId: Settings.userId});
+
+          model.url = model.userRelationUrl();
+          model.fetch({
+            success: function (model) {
+              callback(null, model);
+            },
+            error: function (model, err) {
+              if (err.status === 500) {
+                return callback(err, model);
               }
-            });
 
-          }
-        });
-      },
-      function fetchUserDeliveryAddresses(callback) {
-        var collection = new DeliveryAddressCollection();
+              // not create delivery info before
+              model.url = model.userRelationUrl();
+              model.save(model.attributes, {
+                success: function (model) {
+                  callback(null, model);
+                },
+                error: function (model, err) {
+                  callback(err);
+                }
+              });
 
-        collection.userId = Settings.userId;
-        collection.url = collection.userRelationUrl();
-        collection.fetch({
-          success: function (collection) {
-            callback(null, collection);
-          },
-          error: function (collection, err) {
-            callback(err);
-          }
-        });
-      }
-    ], function (err, results) {
-      if (err) {
-        alert('初始化收货信息失败!');
-        return console.error('Error: ' + err);
-      }
-      console.log('InitDeliveryAddressInfo success!' + results);
+            }
+          });
+        },
+        function fetchUserDeliveryAddresses(callback) {
+          var collection = new DeliveryAddressCollection();
 
-      var deliveryInfo = results[0];
-      var deliveryAddress = results[1];
-      var deliveryAddressInfo;
+          collection.userId = Settings.userId;
+          collection.url = collection.userRelationUrl();
+          collection.fetch({
+            success: function (collection) {
+              callback(null, collection);
+            },
+            error: function (collection, err) {
+              callback(err);
+            }
+          });
+        }
+      ], function (err, results) {
+        if (err) {
+          alert('初始化收货信息失败!');
+          return console.error('Error: ' + err);
+        }
+        console.log('InitDeliveryAddressInfo success!' + results);
 
-      if (deliveryInfo && deliveryAddress && deliveryAddress.length > 0) {
-        localStorage.setItem(Settings.locals.userDeliveryInfo, JSON.stringify(deliveryInfo.toJSON()));
-        localStorage.setItem(Settings.locals.userDeliveryAddress, JSON.stringify(deliveryAddress.toJSON()));
+        var deliveryInfo = results[0];
+        var deliveryAddress = results[1];
 
-        var defaultAddressId = deliveryInfo.get('defaultAddressId');
-        deliveryAddressInfo = defaultAddressId ? deliveryAddress.get(defaultAddressId) : deliveryAddress.at(0);
-      }
-      self.trigger('deliveryAddressInfoReady', deliveryAddressInfo);
-    });
+        if (deliveryInfo && deliveryAddress && deliveryAddress.length > 0) {
+          localStorage.setItem(Settings.locals.userDeliveryInfo, JSON.stringify(deliveryInfo.toJSON()));
+          localStorage.setItem(Settings.locals.userDeliveryAddress, JSON.stringify(deliveryAddress.toJSON()));
+
+          var defaultAddressId = deliveryInfo.get('defaultAddressId');
+          deliveryAddressInfo = defaultAddressId ? deliveryAddress.get(defaultAddressId) : deliveryAddress.at(0);
+        }
+        self.trigger('deliveryAddressInfoReady', deliveryAddressInfo.toJSON());
+      });
+    }
   },
   initOrderInfo: function () {
     var self = this;
@@ -166,7 +181,7 @@ module.exports = Page.extend({
   },
   renderDeliveryAddressInfo: function (deliveryAddressInfo) {
     var view = new OrderDeliveryInfoView({
-      model: deliveryAddressInfo,
+      model: new DeliveryAddressModel(deliveryAddressInfo),
       ids: this.ids
     });
     view.setElement(this.$el.find('.delivery-info'));
@@ -219,7 +234,7 @@ module.exports = Page.extend({
 
         var tasks = [];
         _.each(orderItems.models, function (model) {
-          model.set('orderId', model.id);
+          model.set('orderId', order.id);
 
           tasks.push(function (callback) {
             model.save(model.attributes, {

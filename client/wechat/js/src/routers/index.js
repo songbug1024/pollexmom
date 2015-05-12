@@ -25,13 +25,19 @@ module.exports = Router.extend({
     "": "index",
     "product/:productId": "productDetail",
     "personal-center": "personalCenter",
+    "personal-center/personal-info": "personalInfo",
     "personal-info": "personalInfo",
     "shopping-cart": "shoppingCart",
     "generate-order/:ids": "generateOrder",
     "generate-order/:ids/delivery-address/:addressId": "deliveryAddress",
     "generate-order/:ids/delivery-time": "deliveryTime",
     "order-success": "orderSuccess",
+
+    "personal-center/my-orders": "myOrders",
     "my-orders": "myOrders",
+    "personal-center/my-orders/:type": "myOrders",
+    "my-orders/:type": "myOrders",
+
     "search": "search", // TODO
     "category": "category"
   },
@@ -95,10 +101,11 @@ module.exports = Router.extend({
       viewCreator: function (options) {
         return new GenerateOrderView(options).render();
       },
-      removeWhenHide: true,
       viewCreatorOptions: {
         ids: ids
-      }
+      },
+      cache: true,
+      refresh: true
     });
   },
   deliveryAddress: function(ids, addressId) {
@@ -112,7 +119,7 @@ module.exports = Router.extend({
       removeWhenHide: true,
       viewCreatorOptions: {
         ids: ids,
-        id: addressId
+        addressId: addressId
       }
     });
   },
@@ -127,14 +134,17 @@ module.exports = Router.extend({
       }
     });
   },
-  myOrders: function () {
+  myOrders: function (type) {
     changePage({
       id: 'my-orders-page',
       viewCreator: function (options) {
         return new MyOrdersView(options).render();
       },
       cache: true,
-      refresh: true
+      refresh: true,
+      viewCreatorOptions: {
+        type: type
+      }
     });
   },
   search: function () {
@@ -159,29 +169,38 @@ var allPages = {};
 
 function changePage(options) {
   options = options || {};
+
   var id = options.id;
   var viewCreator = options.viewCreator;
   var existedPage = $('#' + id);
   var view;
   var containerEl = $('body');
+  var page = allPages[id];
 
-  containerEl.attr('data-page', id)
+  allPages[id] = page = page || {};
+  page.cache = options.cache;
+  page.removeWhenHide = options.removeWhenHide;
+  page.refresh = options.refresh;
+
+  containerEl.attr('data-page', id);
   if (!existedPage || existedPage.length <= 0) {
     view = viewCreator(options.viewCreatorOptions);
     containerEl.append(view.el);
     existedPage = view.$el;
 
-    if (options.cache) {
-      allPages[id] = view;
+    if (page.cache) {
+      page.view = view;
     }
 
   } else {
-    if (options.refresh && allPages[id]) {
-      allPages[id].trigger('refresh');
+    if (page.refresh && page.cache) {
+      page.view.trigger('refresh');
     }
   }
 
   var activePageEl = $('body .active[data-role="page"]');
+  var activePageId = activePageEl.attr('id');
+  var activePage = allPages[activePageId];
 
   existedPage.fadeIn(350, function () {
     existedPage.addClass('active');
@@ -190,6 +209,6 @@ function changePage(options) {
   activePageEl.fadeOut(350, function () {
     activePageEl.removeClass('active');
 
-    if (options.removeWhenHide) activePageEl.remove();
+    if (activePage.removeWhenHide) activePageEl.remove();
   });
 }

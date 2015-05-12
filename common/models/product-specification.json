@@ -25,8 +25,7 @@
       "type": "string"
     },
     "inventoryCount": {
-      "type": "number",
-      "required": true
+      "type": "number"
     },
     "saleCount": {
       "type": "number"

@@ -73,6 +73,7 @@ module.exports = View.extend({
     this.setPurchaseNum(e, true);
   },
   addIntoShoppingCartEvent: function (e, success, error) {
+    var self = this;
     var chooseSpecIndex = this.model.get('chooseSpecIndex');
     var chooseSpecModel = this.model.get('chooseSpecModel');
     var selected = chooseSpecIndex >= 0 && chooseSpecModel.id && !_.isEmpty(chooseSpecModel.attributes);
@@ -128,6 +129,8 @@ module.exports = View.extend({
             success(model.attributes);
             console.log('Added into shopping cart success!', model);
             localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(storedShoppingCart));
+
+            self.resetProductStatus();
           },
           error: function (model, err) {
             console.error('Error: ' + err);
@@ -211,6 +214,8 @@ module.exports = View.extend({
           }
           localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(shoppingCart.toJSON()));
           success(model.attributes);
+
+          self.resetProductStatus();
         });
 
       }
@@ -218,9 +223,20 @@ module.exports = View.extend({
   },
   goToOrderEvent: function (e) {
     this.addIntoShoppingCartEvent(e, function(item) {
+      var storedShoppingCart = JSON.parse(localStorage.getItem(Settings.locals.userShoppingCart));
+
+      if (storedShoppingCart) {
+        storedShoppingCart.items.push[item];
+        localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(storedShoppingCart));
+      }
+
       window.pollexmomApp.navigate("/generate-order/" + item.id, {trigger: true});
     }, function () {
       alert('下单失败！');
     })
+  },
+  resetProductStatus: function () {
+    this.model.set('chooseSpecIndex', 0);
+    this.$el.find('.good_num>input').val(1);
   }
 });

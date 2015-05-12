@@ -29,7 +29,7 @@ module.exports = Page.extend({
     }
     this.ids = ids;
 
-    var itemId = options.id;
+    var itemId = options.addressId;
     var storedDeliveryAddress = localStorage.getItem(Settings.locals.userDeliveryAddress);
     var deliveryAddress = {
       userId: Settings.userId
@@ -121,6 +121,7 @@ module.exports = Page.extend({
     }
   },
   saveBtnEvent: function (e) {
+    var self = this;
     var ids = this.ids;
     var consigneeName = this.$el.find('input.consigneeName').val();
     var consigneeTel = this.$el.find('input.consigneeTel').val();
@@ -151,6 +152,8 @@ module.exports = Page.extend({
         detailAddress: detailAddress
       }, {
         success: function (model, err) {
+          self.insertOrUpdateCache(isEdit, model.toJSON());
+
           alert(isEdit ? '编辑成功' : '新增成功');
           window.pollexmomApp.navigate("/generate-order/" + ids, {trigger: true});
         },
@@ -160,5 +163,16 @@ module.exports = Page.extend({
         }
       });
     }
+  },
+  insertOrUpdateCache: function (isEdit, address) {
+    var storedAddress = JSON.parse(localStorage.getItem(Settings.locals.userDeliveryAddress));
+    storedAddress = storedAddress || [];
+
+    if (isEdit) {
+      _.extend(_.findWhere(storedAddress, {id: address.id}), address);
+    } else {
+      storedAddress.push[address];
+    }
+    localStorage.setItem(Settings.locals.userDeliveryAddress, JSON.stringify(storedAddress));
   }
 });

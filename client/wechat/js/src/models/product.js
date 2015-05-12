@@ -10,6 +10,7 @@ var ProductSpecModel = require('./product-spec');
 module.exports = Model.extend({
   name: 'Product',
   defaults: {
+    inventoryCount: 0,
     chooseSpecIndex: -1,
     previewImages: "[]",
     detailImages: "[]",
@@ -46,10 +47,12 @@ module.exports = Model.extend({
     var specifications = model.get('specifications');
     var chooseSpecModel = model.get('chooseSpecModel');
 
+    chooseSpecModel.clear();
     if (value >= 0 && specifications && !_.isEmpty(specifications)) {
+//      var unionProperties = _.union(_.keys(chooseSpecModel.attributes), _.keys(specifications[value]));
+//      _.pick(specifications[value], unionProperties);
+
       chooseSpecModel.set(specifications[value]);
-    } else {
-      chooseSpecModel.clear();
     }
   }
 });

@@ -86,9 +86,54 @@ body[data-page='personal-info-page'] {
     font-size: 14px;
     font-weight: normal;
 }
-#my-orders-page .order-list {
+.order-list {
     display: none;
 }
-#my-orders-page .order-list.active {
+.order-list.active {
     display: block;
+}
+.order-list .user-order {
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 10px;
+    -webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px;
+}
+.order-list .user-order:last-child {
+    margin-bottom: 0px;
+}
+.order-list .order-title {
+
+}
+.order-list .order-amount {
+    padding: 5px 5px 0;
+    text-align: right;
+}
+.order-list .amount-price {
+    font-size: 16px;
+}
+.user_dd_cont ul.user_dd_item {
+    margin-bottom: 0;
+    border-bottom: #ddd 1px solid;
+}
+.user_dd_rbot {
+    margin-top: 0;
+}
+.user_dd_rtop {
+    border-bottom: none;
+}
+.user_dd_rbot a.btn_ddfk {
+    cursor: pointer;
+}
+.user_dd_rbot a.btn_ddfk.canceled {
+    background-color: #C0C0C0;
+}
+.user_dd_rbot a.btn_ddfk.cancel {
+    background-color: #EAC5CE;
+}
+.order-list .no-result {
+    padding: 40px 0;
+    text-align: center;
+    font-size: 18px;
+    color: rgb(80, 29, 116);
+    background-color: #fff;
 }
