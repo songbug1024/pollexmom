@@ -40,14 +40,20 @@ module.exports = {
     var queryString = '';
     var include;
 
+    if (typeof includes === 'string') {
+      includes = [includes];
+    }
+
     for (var key in includes) {
       include = includes[key];
-      if (include && !_.isEmpty(include)) {
+      if (typeof include === 'string') {
+        queryString += 'filter[include]=' + include + '&';
+      } else if (_.isArray(include)) {
         for (var index in include) {
           queryString += 'filter[include][' + key + ']=' + include[index] + '&';
         }
       } else {
-        queryString += 'filter[include]=' + key + '&';
+        // TODO
       }
     }
 
