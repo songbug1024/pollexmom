@@ -140,7 +140,7 @@ module.exports = Page.extend({
 
       this.model.url = isEdit
         ? this.model.idUrl()
-        : this.model.relationUrl();
+        : this.model.relationUrl('users');
 
       this.model.save({
         consigneeName: consigneeName,
