@@ -8,13 +8,8 @@ var Model = require('../models/product');
 
 module.exports = Collection.extend({
   name: 'Product',
+  plural: 'products',
   model: Model,
-  urlRoot: function () {
-    return this.baseUrl + 'products';
-  },
-  url: function () {
-    return this.indexUrl();
-  },
   indexUrl: function () {
     var queryString = this.qFields({
       id: 1,

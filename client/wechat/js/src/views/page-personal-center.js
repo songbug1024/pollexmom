@@ -9,7 +9,6 @@
 var _ = require('underscore');
 var Page = require('../base/page');
 var template = require('../templates/personal-center.tpl');
-var FooterNavbarView = require('./footer-navbar');
 var Settings = require('../settings.json');
 var UserModel = require('../models/user');
 
@@ -29,7 +28,7 @@ module.exports = Page.extend({
 
     this.$el.empty();
     this.$el.html(this.template(model.attributes));
-    this.$el.append(new FooterNavbarView().render().el);
+    this.$el.append('<div class="blank66"></div>');
     return this;
   }
 });

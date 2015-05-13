@@ -7,22 +7,16 @@ var Model = require('../base/model');
 
 module.exports = Model.extend({
   name: 'ShoppingCartItem',
+  plural: 'shopping-cart-items',
   defaults: {
     checked: false
   },
-  urlRoot: function () {
-    return this.baseUrl + 'shopping-cart-items';
-  },
   initialize: function () {
   },
-  url: function () {
-    return this.urlRoot() + (this.id ? ('/' + this.id) : '');
-  },
-  shoppingCartRelationUrl: function () {
-    var shoppingCartId = this.get('shoppingCartId');
-    if (!shoppingCartId) {
-      console.error('Model \'' + this.name + '\' shoppingCartRelationUrl error: shoppingCartId is invalid.');
+  relations: {
+    'shopping-carts': {
+      foreignKey: 'shoppingCartId',
+      humpTypePlural: 'items'
     }
-    return this.baseUrl + 'shopping-carts/'+ shoppingCartId + '/items';
   }
 });

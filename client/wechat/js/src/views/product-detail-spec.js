@@ -79,10 +79,14 @@ module.exports = View.extend({
     var selected = chooseSpecIndex >= 0 && chooseSpecModel.id && !_.isEmpty(chooseSpecModel.attributes);
 
     success = success || function () {
-      alert('添加成功!');
+      if (confirm('添加成功，是否去购物车查看？')) {
+        window.pollexmomApp.navigate("/shopping-cart", {trigger: true});
+      }
     };
     error = error || function () {
-      alert('添加失败!');
+      if (confirm('添加至购物车失败，是否再次尝试？')) {
+        self.addIntoShoppingCartEvent(e, success, error);
+      }
     };
 
     if (!selected) {
@@ -108,6 +112,7 @@ module.exports = View.extend({
 
       var storedShoppingCart = localStorage.getItem(Settings.locals.userShoppingCart);
       storedShoppingCart = JSON.parse(storedShoppingCart);
+
       if (storedShoppingCart && storedShoppingCart.id) {
         var productId = shoppingCartItemModel.get('productId');
         var specificationId = shoppingCartItemModel.get('specificationId');
@@ -121,19 +126,21 @@ module.exports = View.extend({
           shoppingCartItemModel.set('shoppingCartId', storedShoppingCart.id);
         }
 
-        shoppingCartItemModel.save(shoppingCartItemModel.attributes, {
+        shoppingCartItemModel.set('checked', undefined);
+        shoppingCartItemModel.save(shoppingCartItemModel.toJSON(), {
           success: function (model) {
             if (!existedItem) {
               storedShoppingCart.items.push(model.attributes);
             }
-            success(model.attributes);
             console.log('Added into shopping cart success!', model);
             localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(storedShoppingCart));
 
             self.resetProductStatus();
+            success(model.attributes);
           },
           error: function (model, err) {
             console.error('Error: ' + err);
+            localStorage.removeItem(Settings.locals.userShoppingCart);
             error();
           }
         });
@@ -144,21 +151,23 @@ module.exports = View.extend({
           function checkShoppingCart(callback){
             var shoppingCartModel = new ShoppingCartModel({userId: window._currentUserId});
 
-            shoppingCartModel.url = shoppingCartModel.checkUrl();
+            shoppingCartModel.url = shoppingCartModel.userRelationIncludeItemsUrl();
             shoppingCartModel.fetch({
               success: function (model) {
                 callback(null, model);
+//                callback(null, model, true);
               },
               error: function (model, err) {
                 if (err.status === 500) {
-                  return callback(err, model);
+                  return callback(err);
                 }
 
                 // not create shopping cart before
-                model.url = model.checkUrl();
-                model.save(model.attributes, {
+                model.url = model.relationUrl('users');
+                model.save({}, {
                   success: function (model) {
                     callback(null, model);
+//                    callback(null, model, false);
                   },
                   error: function (model, err) {
                     callback(err);
@@ -168,17 +177,21 @@ module.exports = View.extend({
               }
             });
           },
-          function loadItems(shoppingCart, callback) {
-            shoppingCart.url = shoppingCart.userRelationUrl();
-            shoppingCart.fetch({
-              success: function (model) {
-                callback(null, model);
-              },
-              error: function (model, err) {
-                callback(err);
-              }
-            });
-          },
+//          function loadItems(shoppingCart, isLoad, callback) {
+//            if (!isLoad) {
+//              return callback(null, shoppingCart);
+//            }
+//
+//            shoppingCart.url = shoppingCart.idIncludeItemsUrl();
+//            shoppingCart.fetch({
+//              success: function (model) {
+//                callback(null, model);
+//              },
+//              error: function (model, err) {
+//                callback(err);
+//              }
+//            });
+//          },
           function saveItem(shoppingCart, callback) {
             var productId = shoppingCartItemModel.get('productId');
             var specificationId = shoppingCartItemModel.get('specificationId');
@@ -192,8 +205,8 @@ module.exports = View.extend({
               shoppingCartItemModel.set('shoppingCartId', shoppingCart.id);
             }
 
-            shoppingCartItemModel.save(shoppingCartItemModel.attributes, {
-              patch: true,
+            shoppingCartItemModel.set('checked', undefined);
+            shoppingCartItemModel.save(shoppingCartItemModel.toJSON(), {
               success: function (model) {
                 callback(null, model, shoppingCart, !existedItem);
               },
@@ -204,6 +217,8 @@ module.exports = View.extend({
           }
         ], function (err, model, shoppingCart, append) {
           if (err) {
+            localStorage.removeItem(Settings.locals.userShoppingCart);
+
             error();
             return console.error('Error: ' + err);
           }
@@ -213,16 +228,18 @@ module.exports = View.extend({
             shoppingCart.get('items').push(model.attributes);
           }
           localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(shoppingCart.toJSON()));
-          success(model.attributes);
 
           self.resetProductStatus();
+
+          success(model.attributes);
         });
 
       }
     }
   },
   goToOrderEvent: function (e) {
-    this.addIntoShoppingCartEvent(e, function(item) {
+    var self = this;
+    var success = function(item) {
       var storedShoppingCart = JSON.parse(localStorage.getItem(Settings.locals.userShoppingCart));
 
       if (storedShoppingCart) {
@@ -231,12 +248,16 @@ module.exports = View.extend({
       }
 
       window.pollexmomApp.navigate("/generate-order/" + item.id, {trigger: true});
-    }, function () {
-      alert('下单失败！');
-    })
+    };
+    var error = function () {
+      if (confirm('下单失败，是否再次尝试？')) {
+        self.goToOrderEvent(e, success, error);
+      }
+    };
+    this.addIntoShoppingCartEvent(e, success, error);
   },
   resetProductStatus: function () {
-    this.model.set('chooseSpecIndex', 0);
+//    this.model.set('chooseSpecIndex', 0);
     this.$el.find('.good_num>input').val(1);
   }
 });

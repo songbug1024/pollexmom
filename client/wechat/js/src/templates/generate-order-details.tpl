@@ -8,10 +8,10 @@
     </div>
 </div>
 <div class="sh_bd2">
-    <a href="javascript:void('#generate-order/{{=ids}}/delivery-time');">
+    <a href="#generate-order/{{=ids}}/delivery-time">
         <div class="sh_info">
             <p class="sh_name huise">送货时间</p>
-            <p class="sh_add">2015年8月26日</p>
+            <p class="sh_add delivery-time">{{=deliveryTimeStr}}</p>
             <span class="s-point"></span>
         </div>
     </a>

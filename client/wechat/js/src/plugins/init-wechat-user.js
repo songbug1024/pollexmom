@@ -126,7 +126,7 @@ function initWeChatUserInfo(weChatData, callback) {
                             callback(null, model)
                         });
                         */
-                    },
+                    }
                 ], function (err, user) {
                     if (err) {
                         console.error('verifyRegisterWeChatUser error ' + err);

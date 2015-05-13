@@ -10,7 +10,6 @@ var _ = require('underscore');
 var $ = require('jquery');
 var Page = require('../base/page');
 var template = require('../templates/my-orders.tpl');
-var FooterNavbarView = require('./footer-navbar');
 var Settings = require('../settings.json');
 var OrderCollection = require('../collections/order');
 var OrderView = require('./order');
@@ -46,7 +45,7 @@ module.exports = Page.extend({
   render: function (model) {
     this.$el.empty();
     this.$el.html(this.template());
-    this.$el.append(new FooterNavbarView().render().el);
+    this.$el.append('<div class="blank66"></div>');
 
     this.prepareOrders(this.type || 'tobePaid');
     return this;

@@ -15,7 +15,7 @@
   },
   "properties": {
     "userNumber": {
-      "type": "number",
+      "type": "string",
       "index": {"unique": true},
       "oracle": {
         "columnName": "USER_NUMBER"

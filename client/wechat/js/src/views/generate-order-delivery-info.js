@@ -24,6 +24,6 @@ module.exports = View.extend({
     return this;
   },
   editBtnEvent: function (e) {
-    window.pollexmomApp.navigate("/generate-order/" + this.ids + "/delivery-address/" + (this.model ? this.model.id : 'null'), {trigger: true});
+    window.pollexmomApp.navigate("/generate-order/" + this.ids + "/delivery-address" + (this.model && this.model.id ? '/' + this.model.id : ''), {trigger: true});
   }
 });

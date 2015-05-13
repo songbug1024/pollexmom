@@ -7,7 +7,6 @@ var $ = require('jquery');
 var _ = require('underscore');
 var Router = require('../base/router');
 var Settings = require('../settings.json');
-var ProductModel = require('../models/product');
 var IndexPageView = require('../views/page-index');
 var ProductPageView = require('../views/page-product');
 var PersonalCenterView = require('../views/page-personal-center');
@@ -15,10 +14,12 @@ var PersonalInfoView = require('../views/page-personal-info');
 var ShoppingCartView = require('../views/page-shopping-cart');
 var GenerateOrderView = require('../views/page-generate-order');
 var DeliveryAddressView = require('../views/page-edit-delivery-address');
+var DeliveryDateView = require('../views/page-edit-delivery-date');
 var OrderSuccessView = require('../views/page-order-success');
 var MyOrdersView = require('../views/page-my-orders');
 var SearchView = require('../views/page-search');
 var CategoryView = require('../views/page-category');
+var FooterNavbarView = require('../views/footer-navbar');
 
 module.exports = Router.extend({
   routes: {
@@ -28,8 +29,12 @@ module.exports = Router.extend({
     "personal-center/personal-info": "personalInfo",
     "personal-info": "personalInfo",
     "shopping-cart": "shoppingCart",
+
     "generate-order/:ids": "generateOrder",
+
+    "generate-order/:ids/delivery-address": "deliveryAddress",
     "generate-order/:ids/delivery-address/:addressId": "deliveryAddress",
+
     "generate-order/:ids/delivery-time": "deliveryTime",
     "order-success": "orderSuccess",
 
@@ -66,7 +71,7 @@ module.exports = Router.extend({
       viewCreator: function (options) {
         return new ProductPageView(options);
       },
-      viewCreatorOptions: {model: new ProductModel(product)}
+      viewCreatorOptions: {product: product}
     });
   },
   personalCenter: function() {
@@ -109,8 +114,6 @@ module.exports = Router.extend({
     });
   },
   deliveryAddress: function(ids, addressId) {
-    if (addressId === 'null') addressId = null;
-
     changePage({
       id: 'delivery-address-page',
       viewCreator: function (options) {
@@ -123,15 +126,26 @@ module.exports = Router.extend({
       }
     });
   },
-  deliveryTime: function () {
-    // TODO
+  deliveryTime: function (ids, date) {
+    changePage({
+      id: 'delivery-date-page',
+      viewCreator: function (options) {
+        return new DeliveryDateView(options).render();
+      },
+      removeWhenHide: true,
+      viewCreatorOptions: {
+        ids: ids,
+        addressId: date
+      }
+    });
   },
   orderSuccess: function () {
     changePage({
       id: 'order-success-page',
       viewCreator: function (options) {
         return new OrderSuccessView(options).render();
-      }
+      },
+      removeWhenHide: true
     });
   },
   myOrders: function (type) {
@@ -181,6 +195,7 @@ function changePage(options) {
   page.cache = options.cache;
   page.removeWhenHide = options.removeWhenHide;
   page.refresh = options.refresh;
+  page.hideNavbar = options.hideNavbar || false;
 
   containerEl.attr('data-page', id);
   if (!existedPage || existedPage.length <= 0) {
@@ -211,4 +226,16 @@ function changePage(options) {
 
     if (activePage.removeWhenHide) activePageEl.remove();
   });
+
+  var footerNavBarEl = $('#footer-navbar');
+  if (!footerNavBarEl || footerNavBarEl.length <= 0) {
+    footerNavBarEl = new FooterNavbarView().render().el;
+    $('body').append(footerNavBarEl);
+    footerNavBarEl = $(footerNavBarEl);
+  }
+  if (page.hideNavbar) {
+    footerNavBarEl.hide();
+  } else {
+    footerNavBarEl.show();
+  }
 }

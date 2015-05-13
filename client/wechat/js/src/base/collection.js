@@ -12,7 +12,6 @@ var Collection = {};
 
 _.extend(Collection, RestQueryString, UrlRelations, {
   name: 'unknown',
-  baseUrl: Settings.apiRoot,
   constructor: function() {
     Backbone.Collection.apply(this, arguments);
   },

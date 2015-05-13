@@ -9,7 +9,6 @@
 var _ = require('underscore');
 var Page = require('../base/page');
 var template = require('../templates/shopping-cart.tpl');
-var FooterNavbarView = require('./footer-navbar');
 var Settings = require('../settings.json');
 var ShoppingCartModel = require('../models/shopping-cart');
 var ShoppingCartListView = require('../views/shopping-cart-list');
@@ -22,7 +21,7 @@ module.exports = Page.extend({
     var model = new ShoppingCartModel({userId: window._currentUserId});
 
     localStorage.removeItem(Settings.locals.userShoppingCart);
-    model.url = model.userRelationUrl();
+    model.url = model.userRelationIncludeItemsUrl();
     model.fetch({
       success: function (model, res) {
         if (!res || !_.isObject(res) || !res.id) {
@@ -57,9 +56,11 @@ module.exports = Page.extend({
     this.$el.html(this.template(model.attributes));
     var items = model.get('items');
     if (items && items.length > 0) {
-      this.$el.find('.shopping-cart-main-container').append(new ShoppingCartListView({model: model}).render().el);
+      var shoppingCartListView = new ShoppingCartListView({model: model});
+      this.listenTo(shoppingCartListView, 'listEmpty', this.render);
+      this.$el.find('.shopping-cart-main-container').append(shoppingCartListView.render().el);
     }
-    this.$el.append(new FooterNavbarView().render().el);
+    this.$el.append('<div class="blank66"></div>');
     return this;
   }
 });

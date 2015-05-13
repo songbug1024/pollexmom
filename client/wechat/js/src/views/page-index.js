@@ -11,20 +11,18 @@ var HeaderView = require('./header');
 var FirstLevelCatView = require('./first-level-cat');
 var AdBoardView = require('./ad-board');
 var ProductListIndexView = require('./product-list-index');
-var FooterNavbarView = require('./footer-navbar');
 
 module.exports = Page.extend({
   id: 'index-page',
   initialize: function () {
-
   },
   render: function () {
     this.$el.empty();
     this.$el.append(new HeaderView().render().el);
     this.$el.append(new FirstLevelCatView().render().el);
-    this.$el.append(new AdBoardView({sliderId: 'index-page-slider'}).render().el);
-    this.$el.append(new ProductListIndexView().render().el);
-    this.$el.append(new FooterNavbarView().render().el);
+    this.$el.append(new AdBoardView({sliderId: 'index-page-slider'}).el);
+    this.$el.append(new ProductListIndexView().el);
+    this.$el.append('<div class="blank66"></div>');
     return this;
   }
 });

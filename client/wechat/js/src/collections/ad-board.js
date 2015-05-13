@@ -9,10 +9,8 @@ var Settings = require('../settings.json');
 
 module.exports = Collection.extend({
   name: 'AdBoard',
+  plural: 'ad-boards',
   model: Model,
-  urlRoot: function () {
-    return this.baseUrl + 'ad-boards';
-  },
   url: function () {
     var queryString = this.qFields({
         status: false

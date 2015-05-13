@@ -7,23 +7,13 @@ var Model = require('../base/model');
 
 module.exports = Model.extend({
   name: 'DeliveryInfo',
-  defaults: {
-  },
-  urlRoot: function () {
-    return this.baseUrl + 'delivery-info';
-  },
+  plural: 'delivery-info',
   initialize: function () {
-
   },
-  url: function () {
-    return this.urlRoot() + '/' + this.id;
-  },
-  userRelationUrl: function () {
-    var userId = this.get('userId');
-    if (!userId) {
-      console.error('Model \'' + this.name + '\' userRelationUrl error: userId is invalid.');
+  relations: {
+    users: {
+      foreignKey: 'userId',
+      humpTypePlural: 'deliveryInfo'
     }
-
-    return this.baseUrl + 'users/' + userId + '/deliveryInfo';
   }
 });

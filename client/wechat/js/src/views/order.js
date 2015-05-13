@@ -40,16 +40,18 @@ module.exports = View.extend({
   },
   cancelOrder: function (e) {
     // TODO add confirm dialog
-    var $el = $(e.currentTarget);
-    this.model.save({status: 1}, {
-      success: function (model) {
-        $el.siblings('.btn_ddfk').remove();
-        $el.removeClass('cancel').addClass('canceled').text('已取消');
-      },
-      error: function (model, err) {
-        alert('取消订单失败');
-        console.log('Cancel order error' + err);
-      }
-    });
+    if (confirm('您确定要取消该订单吗？')) {
+      var $el = $(e.currentTarget);
+      this.model.save({status: 1}, {
+        success: function (model) {
+          $el.siblings('.btn_ddfk').remove();
+          $el.removeClass('cancel').addClass('canceled').text('已取消');
+        },
+        error: function (model, err) {
+          alert('取消订单失败');
+          console.log('Cancel order error' + err);
+        }
+      });
+    }
   }
 });

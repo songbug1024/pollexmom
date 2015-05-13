@@ -9,6 +9,7 @@ var ProductSpecModel = require('./product-spec');
 
 module.exports = Model.extend({
   name: 'Product',
+  plural: 'products',
   defaults: {
     inventoryCount: 0,
     chooseSpecIndex: -1,
@@ -17,8 +18,13 @@ module.exports = Model.extend({
     previewImagesJson: [],
     detailImagesJson: []
   },
-  urlRoot: function () {
-    return this.baseUrl + 'products';
+  detailUrl: function (relations) {
+    relations = relations || ['specifications'];
+
+    var queryString = this.qIncludes(relations)
+      .qEnd();
+
+    return this.idUrl() + '?' + queryString;
   },
   initialize: function () {
     this.on('change:previewImages change:detailImages', this.parseJsonProperties);
@@ -39,9 +45,6 @@ module.exports = Model.extend({
     if (value) {
       model.set('detailImagesJson', JSON.parse(value));
     }
-  },
-  detailUrl: function() {
-    return this.urlRoot() + '/detail?id=' + this.id;
   },
   resetChooseSpecModel: function (model, value) {
     var specifications = model.get('specifications');

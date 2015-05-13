@@ -10,12 +10,10 @@ module.exports = Model.extend({
   plural: 'user-delivery-addresses',
   initialize: function () {
   },
-  userRelationUrl: function () {
-    var userId = this.get('userId');
-    if (!userId) {
-      console.error('Model \'' + this.name + '\' userRelationUrl error: userId is invalid.');
+  relations: {
+    users: {
+      foreignKey: 'userId',
+      humpTypePlural: 'deliveryAddresses'
     }
-
-    return this.baseUrl + 'users/'+ userId + '/deliveryAddresses';
   }
 });

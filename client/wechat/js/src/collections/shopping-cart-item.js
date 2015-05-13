@@ -9,7 +9,5 @@ var Model = require('../models/shopping-cart-item');
 module.exports = Collection.extend({
   name: 'ShoppingCartItem',
   model: Model,
-  urlRoot: function () {
-    return this.baseUrl + 'shopping-cart-items';
-  }
+  plural: 'shopping-cart-items'
 });

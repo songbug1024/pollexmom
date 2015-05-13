@@ -25,7 +25,7 @@ module.exports = View.extend({
     var collection = new AdBoardCollection();
     collection.fetch({reset: true});
 
-    this.listenTo(collection, 'reset', this.render);
+    this.listenToOnce(collection, 'reset', this.render);
   },
   render: function (collection) {
     this.$el.empty();
@@ -42,8 +42,8 @@ module.exports = View.extend({
         titCell: ".hd ul",
         mainCell: ".bd ul",
         effect: "leftLoop",
-        autoPage: true,
-        autoPlay: true
+        autoPage: true/*,
+        autoPlay: true*/ // TODO
       });
     }
     return this;

@@ -8,7 +8,6 @@
  */
 var _ = require('underscore');
 var Page = require('../base/page');
-var FooterNavbarView = require('./footer-navbar');
 var template = require('../templates/search.tpl');
 
 module.exports = Page.extend({
@@ -20,7 +19,7 @@ module.exports = Page.extend({
   render: function () {
     this.$el.empty();
     this.$el.html(this.template());
-    this.$el.append(new FooterNavbarView().render().el);
+    this.$el.append('<div class="blank66"></div>');
     return this;
   }
 });

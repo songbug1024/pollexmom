@@ -10,7 +10,6 @@ var _ = require('underscore');
 var $ = require('jquery');
 var Page = require('../base/page');
 var template = require('../templates/edit-delivery-address.tpl');
-var FooterNavbarView = require('./footer-navbar');
 var Settings = require('../settings.json');
 var DeliveryAddressModel = require('../models/delivery-address');
 var DeliveryAddresses = require('../delivery-addresses.json');
@@ -58,7 +57,7 @@ module.exports = Page.extend({
     }
 
     this.$el.html(this.template(locals));
-    this.$el.append(new FooterNavbarView().render().el);
+    this.$el.append('<div class="blank66"></div>');
 
     this.$el.find('select').change(function (e) {
       self.selectChangeEvent(e);
@@ -140,8 +139,8 @@ module.exports = Page.extend({
       var isEdit = this.model && this.model.id;
 
       this.model.url = isEdit
-        ? this.model.urlRoot() + '/' + this.model.id
-        : this.model.userRelationUrl();
+        ? this.model.idUrl()
+        : this.model.elationUrl();
 
       this.model.save({
         consigneeName: consigneeName,

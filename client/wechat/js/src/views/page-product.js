@@ -9,7 +9,7 @@
 var $ = require('jquery');
 var _ = require('underscore');
 var Page = require('../base/page');
-var FooterNavbarView = require('./footer-navbar');
+var ProductModel = require('../models/product');
 var template = require('../templates/product-detail.tpl');
 var ProductDetailSpecView = require('./product-detail-spec');
 
@@ -19,14 +19,20 @@ module.exports = Page.extend({
   events: {
     'click .good_tabT>li': 'switchTabEvent'
   },
-  initialize: function () {
-    this.model.fetch({url: this.model.detailUrl()});
+  initialize: function (options) {
+    var product = options.product;
 
-    this.listenToOnce(this.model, 'change', this.render);
+    var model = new ProductModel(product);
+    model.url = model.detailUrl();
+    model.fetch();
+
+    this.listenToOnce(model, 'change', this.render);
+    this.model = model;
   },
   render: function (model) {
     model = model || this.model;
     var sliderId = 'product-detail-preview-slider';
+
     this.$el.empty();
     this.$el.attr('data-product-id', model.id);
     this.$el.html(this.template({
@@ -35,7 +41,7 @@ module.exports = Page.extend({
     }));
     var specDetailEl = this.$el.find('.spec-detail');
     specDetailEl.before(new ProductDetailSpecView({model: model}).el);
-    specDetailEl.after(new FooterNavbarView().render().el);
+    specDetailEl.after('<div class="blank66"></div>');
 
     var previewImagesJson = model.get('previewImagesJson');
     if (previewImagesJson && previewImagesJson.length > 0) {

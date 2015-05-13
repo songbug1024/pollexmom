@@ -42,6 +42,12 @@
       "type": "number",
       "required": true
     },
+    "deliveryDate": {
+      "type": "string"
+    },
+    "consumerName": {
+      "type": "string"
+    },
     "shippingParty": {
       "type": "number"
     },

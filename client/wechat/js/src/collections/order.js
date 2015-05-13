@@ -11,16 +11,12 @@ var Settings = require('../settings.json');
 module.exports = Collection.extend({
   name: 'Order',
   model: Model,
-  urlRoot: function () {
-    return this.baseUrl + 'orders';
-  },
-  userRelationUrl: function () {
-    var userId = this.userId;
-    if (!userId) {
-      console.error('Collection \'' + this.name + '\' userRelationUrl error: userId is invalid.');
+  plural: 'orders',
+  relations: {
+    users: {
+      foreignKey: 'userId',
+      humpTypePlural: 'orders'
     }
-
-    return this.baseUrl + 'users/' + userId + '/orders';
   },
   allUrl: function () {
     var queryString = this.qIncludes('items')
@@ -28,7 +24,7 @@ module.exports = Collection.extend({
       .qOrder({id: 'DESC'})
       .qEnd();
 
-    return this.userRelationUrl() + '?' + queryString;
+    return this.relationUrl('users') + '?' + queryString;
   },
   tobePaidUrl: function () {
     var queryString = this.qIncludes('items')
@@ -37,7 +33,7 @@ module.exports = Collection.extend({
       .qOrder({id: 'DESC'})
       .qEnd();
 
-    return this.userRelationUrl() + '?' + queryString;
+    return this.relationUrl('users') + '?' + queryString;
   },
   receiptUrl: function () {
     var queryString = this.qIncludes('items')
@@ -46,6 +42,6 @@ module.exports = Collection.extend({
       .qOrder({id: 'DESC'})
       .qEnd();
 
-    return this.userRelationUrl() + '?' + queryString;
+    return this.relationUrl('users') + '?' + queryString;
   }
 });

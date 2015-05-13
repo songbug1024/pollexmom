@@ -9,15 +9,11 @@ var Model = require('../models/delivery-address');
 module.exports = Collection.extend({
   name: 'DeliveryAddresses',
   model: Model,
-  urlRoot: function () {
-    return this.baseUrl + 'delivery-addresses';
-  },
-  userRelationUrl: function () {
-    var userId = this.userId;
-    if (!userId) {
-      console.error('Collection \'' + this.name + '\' userRelationUrl error: userId is invalid.');
+  plural: 'user-delivery-addresses',
+  relations: {
+    users: {
+      foreignKey: 'userId',
+      humpTypePlural: 'deliveryAddresses'
     }
-
-    return this.baseUrl + 'users/' + userId + '/deliveryAddresses';
   }
 });

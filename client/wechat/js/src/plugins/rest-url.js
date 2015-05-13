@@ -19,10 +19,12 @@ module.exports = {
     return this.idUrl();
   },
   relations: {
+    /*
     users: {
       foreignKey: 'userId',
-
+      humpTypePlural: 'personalInfo',
     }
+    */
   },
   relationUrl: function (key) {
     var relation = this.relations[key];
@@ -31,19 +33,24 @@ module.exports = {
       return console.error('Model \'' + this.name + '\' relationUrl error: <' + key + '> not found.');
     }
 
-    var relationValue = this.get(relationKey);
-    if (!userId) {
-      console.error('Model \'' + this.name + '\' relationUrl error: <' + relationKey + '> is invalid.');
+    var foreignValue = this.get(relation.foreignKey) || this[relation.foreignKey];
+    if (!foreignValue) {
+      console.error('Model \'' + this.name + '\' relationUrl error: <' + relation.foreignKey + '> is invalid.');
     }
 
-    return this.baseUrl + plural + '/'+ userId + '/deliveryAddresses';
-  },
+    return this.baseUrl + key + '/'+ foreignValue + '/' + relation.humpTypePlural;
+  }
+  /*
   humpTypePlural: function  (plural, separator) {
     separator = separator || '-';
 
     var str = '';
     var parts = plural.split('-');
+
+    if (parts.length < 1) {
+
+    } else
     for (var i in parts) {
     }
-  }
+  }*/
 };

@@ -11,6 +11,7 @@ var View = require('../base/view');
 var template = require('../templates/footer-navbar.tpl');
 
 module.exports = View.extend({
+  id: 'footer-navbar',
   role: 'footer',
   template: _.template(template),
   initialize: function () {

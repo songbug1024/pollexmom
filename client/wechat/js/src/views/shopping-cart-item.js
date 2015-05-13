@@ -17,9 +17,10 @@ module.exports = View.extend({
   className: 'gwc_list',
   template: _.template(template),
   events: {
-    'click .good_num .increase': 'increaseNumEvent',
-    'click .good_num .decrease': 'decreaseNumEvent',
-    'click .select-item': 'itemSelectEvent'
+    'click .gwc_good_num .increase': 'increaseNumEvent',
+    'click .gwc_good_num .decrease': 'decreaseNumEvent',
+    'click .select-item': 'itemSelectEvent',
+    'click .gwc_del a': 'itemDeleteEvent'
   },
   initialize: function () {
     this.listenTo(this.model, 'change:checked', this.checkedChangeHandler);
@@ -59,6 +60,22 @@ module.exports = View.extend({
       this.$el.find('.select-item').removeClass('dx_sel').addClass('dx_sel_active');
     } else {
       this.$el.find('.select-item').removeClass('dx_sel_active').addClass('dx_sel');
+    }
+  },
+  itemDeleteEvent: function (e) {
+    var self = this;
+    if (confirm('您确实要把该商品移出购物车吗？')) {
+      this.model.destroy({
+        success: function (model) {
+          self.remove();
+          model.trigger('deleted', model);
+        },
+        error: function (model, err) {
+          console.error('itemDeleteEvent error: ' + err);
+
+          alert('删除商品失败！');
+        }
+      });
     }
   }
 });

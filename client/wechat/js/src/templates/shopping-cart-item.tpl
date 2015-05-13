@@ -7,10 +7,15 @@
             <p class="p_price">￥{{=price}} <span class="specification-name">[ {{=specificationName}} ]</span>
             </p>
         </div>
-        <div class="good_num clearfix">
+        <div class="gwc_good_num clearfix">
             <a class="decrease" href="javascript:;">-</a>
             <input type="text" value="{{=count}}">
             <a class="increase" href="javascript:;">+</a>
+        </div>
+        <div class="gwc_del">
+            <a href="javascript:void(0);">
+                <img src="images/btn_del.png" width="22" height="22">
+            </a>
         </div>
     </div>
 </li>

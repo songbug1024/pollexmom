@@ -20,8 +20,8 @@ var InitWeChatUserPlugin = require('./plugins/init-wechat-user');
 
 InitWeChatUserPlugin({
   subscribe: 1,
-  openid: 'oasdsdasdas223',
-  nickname: '我是帥哥',
+  openid: 'oGyODtxoJ8Em0eXhFzY9ccOLnhV8',
+  nickname: '宝宝妈妈',
   sex: 1,
   city: 'Ganzhou',
   province: 'Jiangxi',

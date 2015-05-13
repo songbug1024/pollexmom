@@ -1,7 +1,7 @@
 {
   "apiRoot": "/api/",
   "env": "debug",
-  "adBoardSize": 3,
+  "adBoardSize": 1,
   "userId": "554f0563f0daa4001b3005ed",
   "order": {
     "dietitianId": "554f04bdf0daa4001b3005ec",
@@ -14,6 +14,7 @@
     "userShoppingCart": "pollexmom_userShoppingCart",
     "userDeliveryAddress": "pollexmom_userDeliveryAddress",
     "userDeliveryInfo": "pollexmom_userDeliveryInfo",
+    "userTempOrder": "pollexmom_userTempOrder",
     "userTobePaidOrders": "pollexmom_userTobePaidOrders",
     "userAllOrders": "pollexmom_userAllOrders",
     "userReceiptOrders": "pollexmom_userReceiptOrders",
@@ -21,6 +22,7 @@
   },
   "pageSize": 20,
   "defaults": {
-    "orderState": 98
+    "orderState": 98,
+    "orderDeliveryDuringDays": 3
   }
 }

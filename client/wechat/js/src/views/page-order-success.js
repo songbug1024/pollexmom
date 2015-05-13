@@ -10,7 +10,6 @@ var _ = require('underscore');
 var Page = require('../base/page');
 var template = require('../templates/order-success.tpl');
 var HeaderView = require('./header');
-var FooterNavbarView = require('./footer-navbar');
 
 module.exports = Page.extend({
   id: 'order-success-page',
@@ -21,7 +20,7 @@ module.exports = Page.extend({
     this.$el.empty();
     this.$el.html(this.template());
     this.$el.find('.success-main').before(new HeaderView().render().el);
-    this.$el.append(new FooterNavbarView().render().el);
+    this.$el.append('<div class="blank66"></div>');
     return this;
   }
 });

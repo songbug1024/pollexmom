@@ -9,7 +9,6 @@
 var _ = require('underscore');
 var Page = require('../base/page');
 var HeaderView = require('./header');
-var FooterNavbarView = require('./footer-navbar');
 var template = require('../templates/category.tpl');
 
 module.exports = Page.extend({
@@ -21,7 +20,7 @@ module.exports = Page.extend({
     this.$el.empty();
     this.$el.html(this.template());
     this.$el.prepend(new HeaderView().render().el);
-    this.$el.append(new FooterNavbarView().render().el);
+    this.$el.append('<div class="blank66"></div>');
     return this;
   }
 });

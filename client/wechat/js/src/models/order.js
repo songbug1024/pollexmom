@@ -8,18 +8,12 @@ var Model = require('../base/model');
 
 module.exports = Model.extend({
   name: 'Order',
+  plural: 'orders',
   defaults: {
     items: [],
     payment: 0
   },
-  urlRoot: function () {
-    return this.baseUrl + 'orders';
-  },
   initialize: function () {
-
-  },
-  url: function () {
-    return this.urlRoot() + (this.id ? ('/' + this.id) : '');
   },
   amountItemsCount: function() {
     return _.reduce(this.get('items'), function(memo, item){

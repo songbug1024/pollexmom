@@ -115,9 +115,6 @@ body[data-page='personal-info-page'] {
     margin-bottom: 0;
     border-bottom: #ddd 1px solid;
 }
-.user_dd_rbot {
-    margin-top: 0;
-}
 .user_dd_rtop {
     border-bottom: none;
 }
@@ -136,4 +133,5 @@ body[data-page='personal-info-page'] {
     font-size: 18px;
     color: rgb(80, 29, 116);
     background-color: #fff;
+    -webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px;
 }

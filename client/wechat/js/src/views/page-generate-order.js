@@ -6,11 +6,11 @@
  * @Copyright: All rights Reserved, Designed By EKai
  *               Copyright(C) 2005-2014
  */
+var $ = require('jquery');
 var _ = require('underscore');
 var async = require('async');
 var Page = require('../base/page');
 var template = require('../templates/generate-order.tpl');
-var FooterNavbarView = require('./footer-navbar');
 var Settings = require('../settings.json');
 var OrderModel = require('../models/order');
 var ShoppingCartModel = require('../models/shopping-cart');
@@ -26,7 +26,8 @@ module.exports = Page.extend({
   id: 'generate-order-page',
   template: _.template(template),
   events: {
-    'click .order-submit-btn': 'submitBtnEvent'
+    'click .order-submit-btn': 'submitBtnEvent',
+    'click .payment input[type="radio"]': 'paymentRadioEvent'
   },
   initialize: function (options) {
     var ids = options.ids;
@@ -59,14 +60,14 @@ module.exports = Page.extend({
         ? _.findWhere(storedUserDeliveryAddress,{id: defaultAddressId})
         : storedUserDeliveryAddress[0];
 
-      this.trigger('deliveryAddressInfoReady', deliveryAddressInfo);
+      this.trigger('deliveryAddressInfoReady', deliveryAddressInfo || {});
     } else {
 
       async.parallel([
         function fetchUserDeliveryInfo(callback){
           var model = new DeliveryInfoModel({userId: window._currentUserId});
 
-          model.url = model.userRelationUrl();
+          model.url = model.relationUrl('users');
           model.fetch({
             success: function (model) {
               callback(null, model);
@@ -77,7 +78,7 @@ module.exports = Page.extend({
               }
 
               // not create delivery info before
-              model.url = model.userRelationUrl();
+              model.url = model.relationUrl('users');
               model.save(model.attributes, {
                 success: function (model) {
                   callback(null, model);
@@ -94,7 +95,7 @@ module.exports = Page.extend({
           var collection = new DeliveryAddressCollection();
 
           collection.userId = window._currentUserId;
-          collection.url = collection.userRelationUrl();
+          collection.url = collection.relationUrl('users');
           collection.fetch({
             success: function (collection) {
               callback(null, collection);
@@ -121,7 +122,7 @@ module.exports = Page.extend({
           var defaultAddressId = deliveryInfo.get('defaultAddressId');
           deliveryAddressInfo = defaultAddressId ? deliveryAddress.get(defaultAddressId) : deliveryAddress.at(0);
         }
-        self.trigger('deliveryAddressInfoReady', deliveryAddressInfo.toJSON());
+        self.trigger('deliveryAddressInfoReady', deliveryAddressInfo ? deliveryAddressInfo.toJSON() : {});
       });
     }
   },
@@ -137,7 +138,7 @@ module.exports = Page.extend({
     } else {
       var model = new ShoppingCartModel({userId: window._currentUserId});
 
-      model.url = model.userRelationUrl();
+      model.url = model.userRelationIncludeItemsUrl();
       model.fetch({
         success: function (model, res) {
           localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(model.toJSON()));
@@ -149,6 +150,19 @@ module.exports = Page.extend({
       });
     }
   },
+  initOtherInfo: function () {
+    var tempOrderInfo = JSON.parse(localStorage.getItem(Settings.locals.userTempOrder));
+
+    if (!tempOrderInfo) {
+      tempOrderInfo = {
+        payment: 1,
+        consumerName: '',
+        deliveryDate: new Date().getTime() + Settings.defaults.orderDeliveryDuringDays * (24 * 60 * 60 * 1000)
+      };
+      localStorage.setItem(Settings.locals.userTempOrder, JSON.stringify(tempOrderInfo));
+    }
+    return tempOrderInfo;
+  },
   parseOrderFromShoppingCart: function (shoppingCart) {
     var ids = this.ids.split(',');
     var items = shoppingCart.items;
@@ -156,6 +170,10 @@ module.exports = Page.extend({
 
     for (var i in ids) {
       var item = _.findWhere(items, {id: ids[i]});
+      if (!item) {
+        console.error('Generate order error: ids is invalid.');
+        return window.pollexmomApp.navigate("/shopping-cart", {trigger: true});
+      }
       orderItemsCollection.add({
         productId: item.productId,
         productName: item.productName,
@@ -171,12 +189,29 @@ module.exports = Page.extend({
     this.orderItemsCollection = orderItemsCollection;
   },
   render: function () {
+    var self = this;
     this.$el.empty();
-    this.$el.html(this.template(this.order.attributes));
-    this.$el.append(new FooterNavbarView().render().el);
+
+    var tempOrderInfo = this.initOtherInfo();
+    var locals = {};
+    _.extend(locals, this.order.attributes, {
+      consumerName: tempOrderInfo.consumerName,
+      payment: tempOrderInfo.payment
+    });
+
+    this.$el.html(this.template(locals));
+    this.$el.append('<div class="blank66"></div>');
 
     this.initDeliveryAddressInfo();
     this.initOrderInfo();
+
+
+    this.$el.find('select.consumer').change(function (e) {
+      self.consumerSelectChangeEvent(e);
+    });
+    this.$el.find('select.consumer').change(function (e) {
+      self.consumerSelectChangeEvent(e);
+    });
     return this;
   },
   renderDeliveryAddressInfo: function (deliveryAddressInfo) {
@@ -205,6 +240,23 @@ module.exports = Page.extend({
     this.$el.find('.generate-submit .count').text(count);
     this.$el.find('.generate-submit .amount').text(amount);
   },
+  consumerSelectChangeEvent: function (e) {
+    var $el = $(e.currentTarget);
+    var value = $el.val();
+    $el.siblings('label').text(value);
+
+    this.saveTempOrderInfo({consumerName: value});
+  },
+  paymentRadioEvent: function (e) {
+    var value = parseInt($(e.currentTarget).val());
+    this.saveTempOrderInfo({payment: value});
+  },
+  saveTempOrderInfo: function (data) {
+    var tempOrderInfo = JSON.parse(localStorage.getItem(Settings.locals.userTempOrder));
+    tempOrderInfo = tempOrderInfo || {};
+    tempOrderInfo = _.extend(tempOrderInfo, data);
+    localStorage.setItem(Settings.locals.userTempOrder, JSON.stringify(tempOrderInfo));
+  },
   submitBtnEvent: function (e) {
     var self = this;
     var order = this.order;
@@ -216,7 +268,9 @@ module.exports = Page.extend({
       status: Settings.defaults.orderState,
       shipperAddress: 'xxxx', // TODO need changed
       receiverAddress: this.$el.find('.delivery-info .receiver-address').text(),
-      payment: parseInt(this.$el.find('.payment .sh_zffs input:checked').val())
+      payment: parseInt(this.$el.find('.payment .sh_zffs input:checked').val()),
+      deliveryDate: this.$el.find('.order-detail .delivery-time').text(),
+      consumerName: this.$el.find('delect .consumer').val()
     };
 
     async.waterfall([
@@ -275,6 +329,7 @@ module.exports = Page.extend({
         return console.error('Error: ' + err);
       }
       localStorage.removeItem(Settings.locals.userShoppingCart);
+      localStorage.removeItem(Settings.locals.userTempOrder);
       window.pollexmomApp.navigate("/order-success", {trigger: true});
     });
   }

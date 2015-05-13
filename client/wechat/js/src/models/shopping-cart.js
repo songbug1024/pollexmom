@@ -7,35 +7,27 @@ var Model = require('../base/model');
 
 module.exports = Model.extend({
   name: 'ShoppingCart',
+  plural: 'shopping-carts',
   defaults: {
     items: [],
     amountPrice: 0,
     checkedPrice: 0
   },
-  urlRoot: function () {
-    return this.baseUrl + 'shopping-carts';
-  },
   initialize: function () {
-
   },
-  url: function () {
-    return this.urlRoot() + '/' + this.id;
-  },
-  userRelationUrl: function () {
-    var userId = this.get('userId');
-    if (!userId) {
-      console.error('Model \'' + this.name + '\' userRelationUrl error: userId is invalid.');
+  relations: {
+    users: {
+      foreignKey: 'userId',
+      humpTypePlural: 'shoppingCart'
     }
-
-    return this.urlRoot() + '/with-items?userId=' + userId;
   },
-  checkUrl: function () {
+  userRelationIncludeItemsUrl: function () {
     var userId = this.get('userId');
-    if (!userId) {
-      console.error('Model \'' + this.name + '\' checkUrl error: userId is invalid.');
-    }
 
-    return this.baseUrl + 'users/' + userId + '/shoppingCart/';
+    return this.urlRoot() + '/findOne?' + this.qWhere({userId: userId}).qIncludes('items').qEnd();
+  },
+  idIncludeItemsUrl: function () {
+    return this.idUrl() + '?' + this.qIncludes('items').qEnd();
   },
   resetAmountPrice: function () {
     var amount = 0;

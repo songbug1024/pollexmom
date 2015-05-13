@@ -39,6 +39,7 @@ module.exports = View.extend({
       _.each(collection.models, function (model) {
         self.listenTo(model, 'change:count', self.resetCountHandler);
         self.listenTo(model, 'change:checked', self.checkedChangeHandler);
+        self.listenTo(model, 'deleted', self.deletedHandler);
         model.listenTo(self, 'selectAllChanged', function (checked) {
           this.set('checked', checked);
         });
@@ -84,6 +85,27 @@ module.exports = View.extend({
     if (checkedModels.length === this.collection.length) {
       this.selectAllChecked = true;
       this.resetSelectAll();
+    }
+  },
+  deletedHandler: function (model) {
+    var storedShoppingCart = JSON.parse(localStorage.getItem(Settings.locals.userShoppingCart));
+    var items = [];
+
+    _.each(storedShoppingCart.items, function (item) {
+      if (item.id !== model.id) {
+        items.push(item);
+      }
+    });
+    storedShoppingCart.items = items;
+    this.model.set('items', items);
+
+    localStorage.setItem(Settings.locals.userShoppingCart, JSON.stringify(storedShoppingCart));
+
+    if (items.length <= 0) {
+      this.trigger('listEmpty');
+    } else {
+      this.model.resetAmountPrice();
+      this.resetCheckedPrice();
     }
   },
   selectAllEvent: function () {

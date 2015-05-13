@@ -15,9 +15,11 @@ module.exports = View.extend({
   className: 'w',
   initialize: function () {
     var collection = new ProductCollection();
+
+    collection.url = collection.indexUrl();
     collection.fetch({reset: true});
 
-    this.listenTo(collection, 'reset', this.render);
+    this.listenToOnce(collection, 'reset', this.render);
   },
   render: function (collection) {
     var self = this;
