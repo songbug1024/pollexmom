@@ -28,7 +28,7 @@ module.exports = Page.extend({
     var allOrders = this.allOrders = new OrderCollection(); //所有
     var tobePaidOrders = this.tobePaidOrders = new OrderCollection(); //待支付
     var receiptOrders = this.receiptOrders = new OrderCollection(); //待收获
-    var userId = Settings.userId;
+    var userId = window._currentUserId;
 
     allOrders.userId = userId;
     allOrders.url = allOrders.allUrl();

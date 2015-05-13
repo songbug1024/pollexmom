@@ -19,7 +19,7 @@ module.exports = Page.extend({
   template: _.template(template),
   initialize: function () {
     var self = this;
-    var model = new ShoppingCartModel({userId: Settings.userId});
+    var model = new ShoppingCartModel({userId: window._currentUserId});
 
     localStorage.removeItem(Settings.locals.userShoppingCart);
     model.url = model.userRelationUrl();

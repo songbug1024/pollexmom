@@ -16,7 +16,8 @@
     "userDeliveryInfo": "pollexmom_userDeliveryInfo",
     "userTobePaidOrders": "pollexmom_userTobePaidOrders",
     "userAllOrders": "pollexmom_userAllOrders",
-    "userReceiptOrders": "pollexmom_userReceiptOrders"
+    "userReceiptOrders": "pollexmom_userReceiptOrders",
+    "searchKeywords": "pollexmom_searchKeywords"
   },
   "pageSize": 20,
   "defaults": {

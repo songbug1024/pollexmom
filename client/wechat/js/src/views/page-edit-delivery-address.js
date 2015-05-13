@@ -32,7 +32,7 @@ module.exports = Page.extend({
     var itemId = options.addressId;
     var storedDeliveryAddress = localStorage.getItem(Settings.locals.userDeliveryAddress);
     var deliveryAddress = {
-      userId: Settings.userId
+      userId: window._currentUserId
     };
     if (itemId && storedDeliveryAddress) {
       storedDeliveryAddress = JSON.parse(storedDeliveryAddress);

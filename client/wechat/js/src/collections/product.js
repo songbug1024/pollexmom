@@ -26,5 +26,24 @@ module.exports = Collection.extend({
       .qWhere({status: 1})
       .qEnd();
     return this.urlRoot() + '?' + queryString;
+  },
+  searchUrl: function (keywords) {
+    if (!keywords) {
+      return console.error('Collection \'' + this.name + '\' searchUrl keywords is invalid.');
+    }
+
+    var queryString = this.qFields({
+      id: 1,
+      name: 1,
+      price: 1,
+      previewImages: 1
+    })
+      .qLimit(20)
+      .qWhere({
+          status: 1,
+          name: [{'like': '%' + keywords + '%'}]
+        })
+      .qEnd();
+    return this.urlRoot() + '?' + queryString;
   }
 });

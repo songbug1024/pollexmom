@@ -7,16 +7,8 @@ var Model = require('../base/model');
 
 module.exports = Model.extend({
   name: 'DeliveryAddresses',
-  defaults: {
-  },
-  urlRoot: function () {
-    return this.baseUrl + 'user-delivery-addresses';
-  },
+  plural: 'user-delivery-addresses',
   initialize: function () {
-
-  },
-  url: function () {
-    return this.urlRoot() + (this.id ? ('/' + this.id) : '');
   },
   userRelationUrl: function () {
     var userId = this.get('userId');

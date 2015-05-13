@@ -23,7 +23,7 @@ module.exports = Collection.extend({
     return this.baseUrl + 'users/' + userId + '/orders';
   },
   allUrl: function () {
-    var queryString = this.qIncludes({items: ''})
+    var queryString = this.qIncludes('items')
       .qLimit(Settings.pageSize)
       .qOrder({id: 'DESC'})
       .qEnd();
@@ -31,7 +31,7 @@ module.exports = Collection.extend({
     return this.userRelationUrl() + '?' + queryString;
   },
   tobePaidUrl: function () {
-    var queryString = this.qIncludes({items: ''})
+    var queryString = this.qIncludes('items')
       .qLimit(Settings.pageSize)
       .qWhere({status: 98}) // 待支付
       .qOrder({id: 'DESC'})
@@ -40,7 +40,7 @@ module.exports = Collection.extend({
     return this.userRelationUrl() + '?' + queryString;
   },
   receiptUrl: function () {
-    var queryString = this.qIncludes({items: ''})
+    var queryString = this.qIncludes('items')
       .qLimit(Settings.pageSize)
       .qWhere({status: 5}) // 待收货
       .qOrder({id: 'DESC'})

@@ -6,15 +6,12 @@
 var _ = require('underscore');
 var Backbone = require('backbone');
 var Settings = require('../settings.json');
-var RestQueryString = require('./rest-querystring');
+var RestQueryString = require('../plugins/rest-querystring');
+var UrlRelations = require('../plugins/rest-url');
 var Model = {};
 
-_.extend(Model, RestQueryString, {
+_.extend(Model, RestQueryString, UrlRelations, {
   name: 'unknown',
-  baseUrl: Settings.apiRoot,
-  idUrl: function () {
-    return this.urlRoot() + '/' + this.id;
-  },
   constructor: function() {
     Backbone.Model.apply(this, arguments);
   },

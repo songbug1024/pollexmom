@@ -142,7 +142,7 @@ module.exports = View.extend({
 
         async.waterfall([
           function checkShoppingCart(callback){
-            var shoppingCartModel = new ShoppingCartModel({userId: Settings.userId});
+            var shoppingCartModel = new ShoppingCartModel({userId: window._currentUserId});
 
             shoppingCartModel.url = shoppingCartModel.checkUrl();
             shoppingCartModel.fetch({

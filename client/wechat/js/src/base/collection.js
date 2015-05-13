@@ -6,11 +6,11 @@
 var _ = require('underscore');
 var Backbone = require('backbone');
 var Settings = require('../settings.json');
-var RestQueryString = require('./rest-querystring');
-
+var RestQueryString = require('../plugins/rest-querystring');
+var UrlRelations = require('../plugins/rest-url');
 var Collection = {};
 
-_.extend(Collection, RestQueryString, {
+_.extend(Collection, RestQueryString, UrlRelations, {
   name: 'unknown',
   baseUrl: Settings.apiRoot,
   constructor: function() {

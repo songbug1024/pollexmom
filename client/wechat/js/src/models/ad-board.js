@@ -7,7 +7,5 @@ var Model = require('../base/model');
 
 module.exports = Model.extend({
   name: 'AdBoard',
-  urlRoot: function () {
-    return this.baseUrl + 'ad-boards';
-  }
+  plural: 'ad-boards'
 });

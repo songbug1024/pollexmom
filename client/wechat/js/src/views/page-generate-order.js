@@ -38,7 +38,7 @@ module.exports = Page.extend({
 
     // TODO test data
     this.order = new OrderModel({
-      consumerId: Settings.userId,
+      consumerId: window._currentUserId,
       dietitianId: Settings.order.dietitianId,
       dietitianName: Settings.order.dietitianName,
       dietitianTel: Settings.order.dietitianTel
@@ -64,7 +64,7 @@ module.exports = Page.extend({
 
       async.parallel([
         function fetchUserDeliveryInfo(callback){
-          var model = new DeliveryInfoModel({userId: Settings.userId});
+          var model = new DeliveryInfoModel({userId: window._currentUserId});
 
           model.url = model.userRelationUrl();
           model.fetch({
@@ -93,7 +93,7 @@ module.exports = Page.extend({
         function fetchUserDeliveryAddresses(callback) {
           var collection = new DeliveryAddressCollection();
 
-          collection.userId = Settings.userId;
+          collection.userId = window._currentUserId;
           collection.url = collection.userRelationUrl();
           collection.fetch({
             success: function (collection) {
@@ -135,7 +135,7 @@ module.exports = Page.extend({
       this.trigger('orderInfoReady', this.parseOrderFromShoppingCart(storeShoppingCart));
 
     } else {
-      var model = new ShoppingCartModel({userId: Settings.userId});
+      var model = new ShoppingCartModel({userId: window._currentUserId});
 
       model.url = model.userRelationUrl();
       model.fetch({

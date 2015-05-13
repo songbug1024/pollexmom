@@ -7,7 +7,23 @@ var _ = require('underscore');
 var Settings = require('../settings.json');
 
 module.exports = {
-  relations: [],
+  baseUrl: Settings.apiRoot,
+  plural: 'unknown',
+  urlRoot: function () {
+    return this.baseUrl + this.plural;
+  },
+  idUrl: function () {
+    return this.urlRoot() + (this.id ? '/' + this.id : '');
+  },
+  url: function () {
+    return this.idUrl();
+  },
+  relations: {
+    users: {
+      foreignKey: 'userId',
+
+    }
+  },
   relationUrl: function (key) {
     var relation = this.relations[key];
 
@@ -22,4 +38,12 @@ module.exports = {
 
     return this.baseUrl + plural + '/'+ userId + '/deliveryAddresses';
   },
+  humpTypePlural: function  (plural, separator) {
+    separator = separator || '-';
+
+    var str = '';
+    var parts = plural.split('-');
+    for (var i in parts) {
+    }
+  }
 };

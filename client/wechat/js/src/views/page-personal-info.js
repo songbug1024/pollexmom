@@ -17,7 +17,7 @@ module.exports = Page.extend({
   id: 'personal-info-page',
   template: _.template(template),
   initialize: function () {
-    var model = new UserModel({id: Settings.userId});
+    var model = new UserModel({id: window._currentUserId});
     model.fetch({url: model.personalInfoUrl()});
 
     this.listenToOnce(model, 'change', this.render);
