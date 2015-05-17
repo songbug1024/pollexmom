@@ -1,0 +1,10 @@
+{
+  "apiRoot": "/api/",
+  "socketIOUrl": "http://localhost:3000/",
+  "env": "debug",
+  "locals": {
+  },
+  "pageSize": 20,
+  "defaults": {
+  }
+}

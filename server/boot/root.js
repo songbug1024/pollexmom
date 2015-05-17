@@ -4,8 +4,12 @@ module.exports = function(server) {
 
   router.get('/', server.loopback.status());
 
-  router.get('/wechat', function(req, res) {
-    res.render('wechat/index');
+  router.get('/mall', function(req, res) {
+    res.render('mall/index');
+  });
+
+  router.get('/chat', function(req, res) {
+    res.render('chat/index');
   });
   server.use(router);
 };

@@ -39,5 +39,5 @@ InitWeChatUserPlugin({
   window._currentUserId = user.id;
 
   window.pollexmomApp = new IndexRoute();
-  Backbone.history.start({pushState: false, root: "/wechat/"});
+  Backbone.history.start({pushState: false, root: "/mall/"});
 });

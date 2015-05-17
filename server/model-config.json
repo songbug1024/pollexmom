@@ -4,7 +4,9 @@
       "loopback/common/models",
       "loopback/server/models",
       "../common/models",
-      "./models"
+      "./models",
+      "../common/mall/models/",
+      "../common/chat/models/"
     ]
   },
   "ACL": {
